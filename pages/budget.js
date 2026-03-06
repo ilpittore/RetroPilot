@@ -17,7 +17,7 @@ function budget(c) {
   Si vous répondez OUI à au moins une de ces questions, alors il y a de fortes chances que la dépense soit à mettre dans cette colonne : <br>
   - Si demain je perdais mon emploi et que je n'avais plus de revenus, est-ce que je pourrais supprimer cette dépense pour améliorer mes fins de mois ?`;
 
-  const DESC_INV = `La colonne verte est réservée aux investissements.<br>
+  const DESC_INV = `La colonne vertes est réservée aux investissements.<br>
   C'est ici que vous allez déterminer quel montant allouer :<br>
   - Dans un 1er temps à l'élaboration de votre matelas de sécurité<br>
   - Dans un 2ème temps à vos investissements`;
