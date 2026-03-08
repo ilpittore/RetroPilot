@@ -23,7 +23,8 @@ function budget(c) {
   - Dans un 2ème temps à vos investissements`;
 
   // ── Comptes courants (depuis Patrimoine) ──────────────────────────────────
-  const comptesList = (D.compteCourants || []).map(cc => cc.name).filter(Boolean);
+  const comptes = (D.compteCourants || []).filter(cc => cc.name).map(cc => ({ name: cc.name, color: cc.color || "#888" }));
+  const getAccountColor = (name) => comptes.find(c => c.name === name)?.color || "#888";
 
   // ── Camembert SVG ─────────────────────────────────────────────────────────
   function drawPie(svgId, segments) {
@@ -101,11 +102,7 @@ function budget(c) {
         </div>
         ${!isAnnuel ? `<div class="form-group" style="margin-bottom:12px">
           <label>Compte associé</label>
-          <select class="dep-form-select" id="modal-acc">
-            ${comptesList.length
-              ? comptesList.map(n => `<option value="${n}">${n}</option>`).join("")
-              : `<option value="">— Aucun compte défini dans Patrimoine —</option>`}
-          </select>
+          <div id="modal-acc-wrapper"></div>
         </div>` : ""}
         <div class="form-group" style="margin-bottom:20px">
           <label>${amtLabel}</label>
@@ -120,6 +117,35 @@ function budget(c) {
       </div>`;
 
     document.body.appendChild(overlay);
+
+    // Custom account picker button in modal
+    let selectedAcc = comptes[0]?.name || "";
+    if (!isAnnuel && comptes.length) {
+      const wrapper = document.getElementById("modal-acc-wrapper");
+      const renderAccBtn = () => {
+        wrapper.innerHTML = "";
+        const acct = comptes.find(c => c.name === selectedAcc);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "dep-form-select";
+        btn.style.cssText = "display:flex;align-items:center;gap:8px;text-align:left;width:100%;cursor:pointer";
+        if (acct) {
+          btn.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${acct.color};flex-shrink:0;display:inline-block"></span><span style="flex:1;font-size:12px">${acct.name}</span><span style="color:var(--text3);font-size:10px">▾</span>`;
+        } else {
+          btn.innerHTML = `<span style="flex:1;font-size:12px;color:var(--text3)">— choisir</span><span style="color:var(--text3);font-size:10px">▾</span>`;
+        }
+        btn.addEventListener("click", e => {
+          e.stopPropagation();
+          openAccountPicker(btn, selectedAcc, comptes, name => { selectedAcc = name; renderAccBtn(); });
+        });
+        wrapper.appendChild(btn);
+      };
+      renderAccBtn();
+    } else if (!isAnnuel) {
+      const wrapper = document.getElementById("modal-acc-wrapper");
+      if (wrapper) wrapper.innerHTML = `<span style="font-size:12px;color:var(--text3)">— Aucun compte défini dans Patrimoine —</span>`;
+    }
+
     setTimeout(() => document.getElementById("modal-lbl")?.focus(), 50);
 
     overlay.addEventListener("keydown", e => {
@@ -131,7 +157,7 @@ function budget(c) {
     document.getElementById("modal-save").addEventListener("click", () => {
       const lbl = document.getElementById("modal-lbl").value.trim();
       const amt = parseFloat(document.getElementById("modal-amt").value);
-      const acc = isAnnuel ? "" : (document.getElementById("modal-acc")?.value || "");
+      const acc = isAnnuel ? "" : selectedAcc;
       if (!lbl)                    return toast("Le libellé est requis");
       if (isNaN(amt) || amt === 0) return toast("Le montant est requis");
       if (isAnnuel) D[opts.dataKeyAnnuel].push({ label: lbl, account: acc, amount: amt });
@@ -187,52 +213,35 @@ function budget(c) {
       inp.addEventListener("keydown", e => { if (e.key === "Enter") inp.blur(); if (e.key === "Escape") refreshCard(); });
     });
 
-    // ── Compte associé (liste déroulante au clic) ──────────────────────────
-    const accColors = ["#5898d8","#f0a020","#c868a8","#34c77b","#e87830","#f5c842"];
+    // ── Compte associé — dot coloré (clic → openAccountPicker) ───────────────
     const accEl = document.createElement("span");
+    accEl.style.cssText = "flex-shrink:0;display:inline-flex;align-items:center;justify-content:center";
     const renderAccBadge = () => {
       accEl.innerHTML = "";
-      if (item.account) {
-        const idx = (item.account.charCodeAt(0) + item.account.length) % accColors.length;
-        const bg = accColors[idx] + "28"; const col = accColors[idx];
-        accEl.style.cssText = `display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500;white-space:nowrap;background:${bg};color:${col};border:1px solid ${col}44;flex-shrink:0;cursor:pointer`;
-        accEl.textContent = item.account;
+      const color = item.account ? getAccountColor(item.account) : null;
+      const dot = document.createElement("span");
+      if (color) {
+        dot.style.cssText = `width:12px;height:12px;border-radius:50%;background:${color};flex-shrink:0;cursor:pointer;display:inline-block;outline:2px solid transparent;outline-offset:1px;transition:outline .12s`;
+        dot.title = item.account;
+        dot.addEventListener("mouseenter", () => { dot.style.outline = `2px solid ${color}`; });
+        dot.addEventListener("mouseleave", () => { dot.style.outline = "2px solid transparent"; });
       } else {
-        accEl.style.cssText = `display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;white-space:nowrap;color:var(--text3);border:1px dashed var(--border2);flex-shrink:0;cursor:pointer`;
-        accEl.textContent = "— compte";
+        dot.style.cssText = "width:12px;height:12px;border-radius:50%;border:1.5px dashed var(--border2);flex-shrink:0;cursor:pointer;display:inline-block;transition:border-color .12s";
+        dot.title = "Assigner un compte";
+        dot.addEventListener("mouseenter", () => { dot.style.borderColor = "var(--amber)"; });
+        dot.addEventListener("mouseleave", () => { dot.style.borderColor = ""; });
       }
+      if (comptes.length) {
+        dot.addEventListener("click", e => {
+          e.stopPropagation();
+          openAccountPicker(dot, item.account, comptes, name => {
+            D[dataKey][i].account = name; saveData(); refreshCard(); refreshAnalysis();
+          });
+        });
+      }
+      accEl.appendChild(dot);
     };
     renderAccBadge();
-    if (comptesList.length) {
-      accEl.addEventListener("click", () => {
-        const sel = document.createElement("select");
-        sel.style.cssText = inlineInputStyle + ";max-width:140px;cursor:pointer";
-        if (!item.account) {
-          const opt = document.createElement("option"); opt.value = ""; opt.textContent = "— choisir"; sel.appendChild(opt);
-        }
-        comptesList.forEach(n => {
-          const opt = document.createElement("option"); opt.value = n; opt.textContent = n;
-          if (n === item.account) opt.selected = true;
-          sel.appendChild(opt);
-        });
-        accEl.innerHTML = ""; accEl.style.cssText = "flex-shrink:0"; accEl.appendChild(sel);
-
-        let committed = false;
-        const commit = () => {
-          if (committed) return; committed = true;
-          D[dataKey][i].account = sel.value; saveData(); refreshCard(); refreshAnalysis();
-        };
-        const cancel = () => { if (committed) return; committed = true; refreshCard(); };
-
-        sel.addEventListener("change", commit);
-        sel.addEventListener("blur", () => setTimeout(cancel, 150));
-        sel.addEventListener("keydown", e => { if (e.key === "Escape") { committed = true; refreshCard(); } });
-
-        // Ouvrir le dropdown au 1er clic
-        sel.focus();
-        try { sel.showPicker(); } catch(e) {}
-      });
-    }
 
     // ── Montant (éditable au clic) ─────────────────────────────────────────
     const amtEl = document.createElement("span"); amtEl.className = "budget-item-amount";
@@ -254,18 +263,30 @@ function budget(c) {
     if (isAnnuel) {
       row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(del);
     } else {
-      row.appendChild(nameEl); row.appendChild(accEl); row.appendChild(amtEl); row.appendChild(del);
+      row.appendChild(accEl); row.appendChild(nameEl); row.appendChild(amtEl); row.appendChild(del);
     }
 
     return row;
   }
 
-  // ── Card description (au-dessus de chaque colonne) ───────────────────────
-  function buildDescCard(color, desc) {
-    const card = document.createElement("div");
-    card.style.cssText = `background:${color}0a;border:1px solid ${color}30;border-radius:var(--radius);padding:12px 16px;box-sizing:border-box`;
-    card.innerHTML = `<p style="font-size:11px;color:var(--text);line-height:1.7;margin:0">${desc}</p>`;
-    return card;
+  // ── Modale info colonne ───────────────────────────────────────────────────
+  function openInfoModal(color, title, desc) {
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:#00000088;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px";
+    overlay.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:420px;width:100%">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0"></span>
+          <span style="font-family:var(--font-head);font-weight:700;font-size:15px">${title}</span>
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7">${desc}</p>
+        <div style="margin-top:20px;text-align:right">
+          <button class="btn btn-ghost btn-sm" id="budget-info-close">Fermer</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector("#budget-info-close").addEventListener("click", () => overlay.remove());
   }
 
   // ── Construire une card (Essentielles ou Envies) ──────────────────────────
@@ -343,8 +364,14 @@ function budget(c) {
     const card1 = document.createElement("div");
     card1.style.cssText = `background:${opts.color}12;border:1px solid ${opts.color}44;border-radius:var(--radius);padding:14px 16px;animation:fadeUp .35s 0s ease both`;
     const card1Head = document.createElement("div");
-    card1Head.style.cssText = `font-family:var(--font-head);font-weight:700;font-size:13px;display:flex;align-items:center;gap:7px`;
-    card1Head.innerHTML = `<span style="width:9px;height:9px;border-radius:50%;background:${opts.color};flex-shrink:0"></span>${opts.title} — Cible ${opts.target}`;
+    card1Head.style.cssText = `font-family:var(--font-head);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:7px`;
+    card1Head.innerHTML = `<div style="display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:${opts.color};flex-shrink:0"></span>${opts.title} — Cible ${opts.target}</div>`;
+    const infoBtn = document.createElement("button");
+    infoBtn.className = "env-info-btn";
+    infoBtn.title = "Info";
+    infoBtn.textContent = "?";
+    infoBtn.addEventListener("click", () => openInfoModal(opts.color, opts.title, opts.desc));
+    card1Head.appendChild(infoBtn);
     const totalEl = document.createElement("div");
     totalEl.style.cssText = `font-family:var(--font-mono);font-size:18px;font-weight:500;color:${opts.color};margin-top:4px`;
     card1.appendChild(card1Head); card1.appendChild(totalEl);
@@ -353,8 +380,13 @@ function budget(c) {
     const card2 = document.createElement("div");
     card2.style.cssText = `background:${opts.color}08;border:1px solid ${opts.color}30;border-radius:var(--radius);overflow:hidden;animation:fadeUp .35s .06s ease both`;
     const h2 = document.createElement("div");
-    h2.style.cssText = `padding:10px 16px;border-bottom:1px solid ${opts.color}20;font-family:var(--font-head);font-weight:700;font-size:12px;color:${opts.color}`;
-    h2.textContent = "Dépenses mensuelles";
+    h2.style.cssText = `padding:10px 16px;border-bottom:1px solid ${opts.color}20;font-family:var(--font-head);font-weight:700;font-size:12px;color:${opts.color};display:flex;align-items:center;justify-content:space-between`;
+    h2.innerHTML = `<span>Dépenses mensuelles</span>`;
+    const addBtn2 = document.createElement("button");
+    addBtn2.className = "env-info-btn"; addBtn2.title = "Ajouter une dépense mensuelle";
+    addBtn2.textContent = "+"; addBtn2.style.fontSize = "14px";
+    addBtn2.addEventListener("click", () => openAddModal({...opts, defaultFreq: "mensuel"}, () => { refresh(); refreshAnalysis(); }));
+    h2.appendChild(addBtn2);
     const body2 = document.createElement("div");
     card2.appendChild(h2); card2.appendChild(body2);
 
@@ -362,18 +394,15 @@ function budget(c) {
     const card3 = document.createElement("div");
     card3.style.cssText = `background:${opts.color}08;border:1px solid ${opts.color}30;border-radius:var(--radius);overflow:hidden;animation:fadeUp .35s .12s ease both`;
     const h3 = document.createElement("div");
-    h3.style.cssText = `padding:10px 16px;border-bottom:1px solid ${opts.color}20;font-family:var(--font-head);font-weight:700;font-size:12px;color:${opts.color}`;
-    h3.textContent = "Dépenses annuelles";
+    h3.style.cssText = `padding:10px 16px;border-bottom:1px solid ${opts.color}20;font-family:var(--font-head);font-weight:700;font-size:12px;color:${opts.color};display:flex;align-items:center;justify-content:space-between`;
+    h3.innerHTML = `<span>Dépenses annuelles</span>`;
+    const addBtn3 = document.createElement("button");
+    addBtn3.className = "env-info-btn"; addBtn3.title = "Ajouter une dépense annuelle";
+    addBtn3.textContent = "+"; addBtn3.style.fontSize = "14px";
+    addBtn3.addEventListener("click", () => openAddModal({...opts, defaultFreq: "annuel"}, () => { refresh(); refreshAnalysis(); }));
+    h3.appendChild(addBtn3);
     const body3 = document.createElement("div");
     card3.appendChild(h3); card3.appendChild(body3);
-
-    const mkAddBtn = (defaultFreq) => {
-      const btn = document.createElement("button"); btn.className = "budget-add-btn";
-      btn.style.cssText = `border-color:${opts.color}55;margin:10px 16px 14px`;
-      btn.innerHTML = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter une dépense`;
-      btn.addEventListener("click", () => openAddModal({...opts, defaultFreq}, () => { refresh(); refreshAnalysis(); }));
-      return btn;
-    };
 
     const refresh = () => {
       const dataMensu = D[opts.dataKeyMensu] || [];
@@ -385,7 +414,6 @@ function budget(c) {
       const st2 = document.createElement("div"); st2.className = "budget-subtotal-row";
       st2.innerHTML = `<span>Sous-total mensuel</span><span class="val">${eur(dataMensu.reduce((s,x)=>s+x.amount,0))}</span>`;
       body2.appendChild(st2);
-      body2.appendChild(mkAddBtn("mensuel"));
 
       // Rebuild card 3
       body3.innerHTML = "";
@@ -393,7 +421,6 @@ function budget(c) {
       const st3 = document.createElement("div"); st3.className = "budget-subtotal-row";
       st3.innerHTML = `<span>Sous-total mensuel</span><span class="val">${eur(dataAnn.reduce((s,x)=>s+x.amount,0)/12)}</span>`;
       body3.appendChild(st3);
-      body3.appendChild(mkAddBtn("annuel"));
 
       // Màj total card 1
       totalEl.textContent = eur(computeColTotal(opts)) + " / mois";
@@ -413,13 +440,21 @@ function budget(c) {
     const card1 = document.createElement("div");
     card1.style.cssText = `background:${COLOR_INV}12;border:1px solid ${COLOR_INV}44;border-radius:var(--radius);padding:14px 16px;animation:fadeUp .35s .16s ease both`;
     card1.innerHTML = `
-      <div style="font-family:var(--font-head);font-weight:700;font-size:13px;display:flex;align-items:center;gap:7px">
-        <span style="width:9px;height:9px;border-radius:50%;background:${COLOR_INV};flex-shrink:0"></span>
-        Investissements — Cible 20%
+      <div style="font-family:var(--font-head);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:7px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="width:9px;height:9px;border-radius:50%;background:${COLOR_INV};flex-shrink:0"></span>
+          Investissements — Cible 20%
+        </div>
       </div>
       <div style="font-family:var(--font-mono);font-size:18px;font-weight:500;color:${COLOR_INV};margin-top:4px" id="budget-invest-total">
         ${eur(D.budgetInvestissement)} / mois
       </div>`;
+    const invInfoBtn = document.createElement("button");
+    invInfoBtn.className = "env-info-btn";
+    invInfoBtn.title = "Info";
+    invInfoBtn.textContent = "?";
+    invInfoBtn.addEventListener("click", () => openInfoModal(COLOR_INV, "Investissements", DESC_INV));
+    card1.querySelector("div").appendChild(invInfoBtn);
 
     // Card 2 — Montant mensuel alloué
     const card2 = document.createElement("div");
@@ -485,7 +520,7 @@ function budget(c) {
       </span>
     </div>
     <div class="pie-wrap">
-      <svg id="budget-pie" width="160" height="160" viewBox="0 0 160 160" style="flex-shrink:0">
+      <svg id="budget-pie" width="150" height="150" viewBox="0 0 160 160" style="flex-shrink:0">
         <circle cx="80" cy="80" r="65" fill="var(--surface2)"/>
       </svg>
       <div class="pie-legend" id="budget-pie-legend"></div>
@@ -502,7 +537,7 @@ function budget(c) {
     const isNeg     = resteVal < 0;
 
     const segments = [
-      { label: "Dépenses essentielles", value: B.essentiel, color: COLOR_ESS },
+      { label: "Essentielles", value: B.essentiel, color: COLOR_ESS },
       { label: "Envies & Projets",      value: enviesPie,   color: COLOR_ENV },
       { label: "Investissements",       value: B.invest,    color: COLOR_INV },
     ];
@@ -519,7 +554,6 @@ function budget(c) {
           <span class="pie-legend-dot" style="background:${s.color}"></span>
           <span class="pie-legend-label">${s.label}</span>
           <span class="pie-legend-val">${isNeg ? "-" : eur(s.value)}</span>
-          <span class="pie-legend-pct">${isNeg ? "-" : (`${pct.toFixed(1)}%/${targetPct}%`)}</span>
         </div>`;
       }).join("") + `
         <div style="height:1px;background:var(--border);margin:6px 0"></div>
@@ -527,7 +561,6 @@ function budget(c) {
           <span class="pie-legend-dot" style="background:transparent;border:none"></span>
           <span class="pie-legend-label" style="color:var(--text2)">Total</span>
           <span class="pie-legend-val" style="color:var(--amber)">${eur(B.salaire)}</span>
-          <span class="pie-legend-pct"></span>
         </div>`;
     }
 
@@ -567,32 +600,11 @@ function budget(c) {
 
   // ── Assembler la page ─────────────────────────────────────────────────────
 
-  // Card salaire
-  const salCard = document.createElement("div"); salCard.className = "card"; salCard.style.padding = "14px 20px";
-  salCard.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      <div style="font-family:var(--font-head);font-weight:700;font-size:13px">
-        Salaire du mois
-      </div>
-      <div style="font-family:var(--font-mono);font-size:20px;font-weight:500;color:var(--amber)">
-        ${eur((D.virements && D.virements.salaireMensuel) || 0)}
-      </div>
-    </div>`;
-  c.appendChild(salCard);
-
-  // Card analyse — juste en dessous du salaire
+  // Card analyse
   c.appendChild(analysisCard);
 
   // Grille 3 colonnes
   const colGrid = document.createElement("div"); colGrid.className = "budget-cols";
-
-  // Grille descriptions (même hauteur grâce au CSS grid)
-  const descGrid = document.createElement("div"); descGrid.className = "budget-cols";
-  descGrid.style.cssText = "align-items: stretch";
-  descGrid.appendChild(buildDescCard(COLOR_ESS, DESC_ESS));
-  descGrid.appendChild(buildDescCard(COLOR_ENV, DESC_ENV));
-  descGrid.appendChild(buildDescCard(COLOR_INV, DESC_INV));
-  c.appendChild(descGrid);
 
   // Col 1 — Essentielles
   const optsEss = { color: COLOR_ESS, id: "ess", title: "Dépenses essentielles", desc: DESC_ESS,

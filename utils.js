@@ -43,22 +43,27 @@ const sum = (arr, key) => arr.reduce((s,x) => s + (x[key]||0), 0);
 // ═══════════════════════════════════════════════════════════════
 
 function computePatrimoine() {
-  const cash    = sum(D.compteCourants, "amount");
-  const livrets = sum(D.livrets, "amount");
-  const plans   = sum(D.plansEpargne, "amount");
-  const etfMkt  = sum(D.etfPositions, "market");
-  const stkMkt  = sum(D.stockPositions, "market");
-  const cryMkt  = sum(D.cryptoPositions, "market");
-  const invest  = etfMkt + stkMkt + cryMkt;
-  const total   = cash + livrets + plans + D.immobilierPerso + invest;
+  const ccTotal    = sum(D.compteCourants, "amount");
+  const liInvTotal = sum(D.liquiditesInvest || [], "amount");
+  const cash       = ccTotal + liInvTotal;
+  const livrets    = sum(D.livrets, "amount");
+  const plans      = sum(D.plansEpargne, "amount");
+  const etfMkt     = sum(D.etfPositions, "market");
+  const stkMkt     = sum(D.stockPositions, "market");
+  const cryMkt     = sum(D.cryptoPositions, "market");
+  const investImmoTotal = sum(D.investImmo || [], "amount");
+  const alternatif      = sum(D.investAlternatif || [], "amount");
+  const invest     = etfMkt + stkMkt + cryMkt + investImmoTotal + alternatif;
+  const immoTotal  = D.immobilierBiens ? sum(D.immobilierBiens, "amount") : (D.immobilierPerso || 0);
+  const total      = cash + livrets + plans + immoTotal + invest;
   const cats = [
-    { label:"Cash",          amount:cash,             color:"var(--chart4)" },
-    { label:"Livrets",       amount:livrets,           color:"var(--chart2)" },
-    { label:"Plans épargne", amount:plans,             color:"var(--chart3)" },
-    { label:"Immobilier",    amount:D.immobilierPerso, color:"var(--chart5)" },
-    { label:"Investissements",amount:invest,           color:"var(--chart1)" },
+    { label:"Cash",           amount:cash,     color:"var(--chart4)" },
+    { label:"Livrets",        amount:livrets,  color:"var(--chart2)" },
+    { label:"Plans épargne",  amount:plans,    color:"var(--chart3)" },
+    { label:"Immobilier",     amount:immoTotal,color:"var(--chart5)" },
+    { label:"Investissements",amount:invest,   color:"var(--chart1)" },
   ].map(c => ({...c, pct: total>0?(c.amount/total*100):0}));
-  return { cash, livrets, plans, invest, total, cats };
+  return { cash, ccTotal, liInvTotal, livrets, plans, etfMkt, stkMkt, cryMkt, investImmoTotal, alternatif, invest, immoTotal, total, cats };
 }
 
 function computeBudget() {
@@ -87,6 +92,7 @@ function closeSidebar() {
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("sidebar-overlay").classList.remove("show");
 }
+document.getElementById("menu-btn").addEventListener("click", toggleSidebar);
 document.getElementById("sidebar-overlay").addEventListener("click", closeSidebar);
 
 // ═══════════════════════════════════════════════════════════════
@@ -186,92 +192,249 @@ function makeEditableAmount(value, onSave, largeFont=false) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ACCOUNT COLORS
+// ═══════════════════════════════════════════════════════════════
+
+const ACCT_PALETTE = ["#5898d8","#f0a020","#c868a8","#e87830","#34c77b","#f5c842","#e05050","#5ab4c8","#9b59b6","#1abc9c"];
+
+function showColorPicker(anchor, currentColor, onSelect) {
+  document.querySelectorAll(".acct-color-picker").forEach(el => el.remove());
+  const picker = document.createElement("div");
+  picker.className = "acct-color-picker";
+  picker.style.cssText = "position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;width:148px;box-shadow:0 4px 16px #0005";
+  ACCT_PALETTE.forEach(color => {
+    const s = document.createElement("div");
+    const isActive = color === currentColor;
+    s.style.cssText = `width:20px;height:20px;border-radius:50%;background:${color};cursor:pointer;flex-shrink:0;outline:${isActive ? `2px solid ${color}` : 'none'};outline-offset:2px;border:2px solid ${isActive ? '#fff' : 'transparent'};transition:transform .1s,outline .1s`;
+    s.addEventListener("mouseenter", () => { s.style.transform = "scale(1.15)"; });
+    s.addEventListener("mouseleave", () => { s.style.transform = ""; });
+    s.addEventListener("click", e => { e.stopPropagation(); picker.remove(); onSelect(color); });
+    picker.appendChild(s);
+  });
+  const rect = anchor.getBoundingClientRect();
+  picker.style.top  = (rect.bottom + 4) + "px";
+  picker.style.left = rect.left + "px";
+  document.body.appendChild(picker);
+  const close = e => { if (!picker.contains(e.target)) { picker.remove(); document.removeEventListener("click", close, true); } };
+  setTimeout(() => document.addEventListener("click", close, true), 0);
+}
+
+function openAccountPicker(anchor, currentName, comptes, onSelect) {
+  document.querySelectorAll(".acct-picker-popup").forEach(el => el.remove());
+  const popup = document.createElement("div");
+  popup.className = "acct-picker-popup";
+  popup.style.cssText = "position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px;min-width:220px;box-shadow:0 4px 16px #0005;display:flex;flex-direction:column;gap:2px";
+  comptes.forEach(({ name, color }) => {
+    const opt = document.createElement("button");
+    const isActive = name === currentName;
+    opt.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;border:none;background:${isActive ? 'var(--surface2)' : 'transparent'};cursor:pointer;width:100%;text-align:left;font-size:12px;color:var(--text);transition:background .1s`;
+    opt.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span><span>${name}</span>`;
+    opt.addEventListener("mouseenter", () => { opt.style.background = "var(--surface2)"; });
+    opt.addEventListener("mouseleave", () => { opt.style.background = isActive ? "var(--surface2)" : "transparent"; });
+    opt.addEventListener("click", e => { e.stopPropagation(); popup.remove(); onSelect(name); });
+    popup.appendChild(opt);
+  });
+  const rect = anchor.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  if (spaceBelow < 200) {
+    popup.style.bottom = (window.innerHeight - rect.top + 4) + "px";
+    popup.style.top = "auto";
+  } else {
+    popup.style.top  = (rect.bottom + 4) + "px";
+  }
+  popup.style.left = rect.left + "px";
+  document.body.appendChild(popup);
+  const close = e => { if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener("click", close, true); } };
+  setTimeout(() => document.addEventListener("click", close, true), 0);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // ACCOUNT TABLE
 // ═══════════════════════════════════════════════════════════════
 
+function openAccountModal(section, title, onSaved) {
+  let selectedColor = ACCT_PALETTE[(D[section]?.length || 0) % ACCT_PALETTE.length];
+
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:#00000088;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px";
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid #f0a02055;border-radius:var(--radius);padding:24px;width:100%;max-width:440px;animation:fadeUp .2s ease">
+      <div style="font-family:var(--font-head);font-weight:700;font-size:15px;margin-bottom:18px;display:flex;align-items:center;gap:8px">
+        <span id="acc-color-preview" style="width:10px;height:10px;border-radius:50%;background:${selectedColor};display:inline-block;flex-shrink:0"></span>
+        Ajouter — ${title}
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Intitulé du compte</label>
+        <input class="form-input" id="acc-name" placeholder="Ex: Compte courant 1 (salaire)">
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Banque</label>
+        <input class="form-input" id="acc-bank" placeholder="Ex: Fortuneo, Boursorama…">
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Montant</label>
+        <input class="form-input" type="number" step="0.01" id="acc-amount" placeholder="0.00"
+          style="font-family:var(--font-mono);font-size:16px">
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label>Couleur</label>
+        <div id="acc-swatches" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost btn-sm" id="acc-cancel">Annuler</button>
+        <button class="btn btn-primary btn-sm" id="acc-save">Valider</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  // Build color swatches
+  const swatchContainer = document.getElementById("acc-swatches");
+  const renderSwatches = () => {
+    swatchContainer.innerHTML = "";
+    ACCT_PALETTE.forEach(color => {
+      const s = document.createElement("div");
+      const isActive = color === selectedColor;
+      s.style.cssText = `width:20px;height:20px;border-radius:50%;background:${color};cursor:pointer;outline:${isActive ? `2px solid ${color}` : 'none'};outline-offset:2px;border:2px solid ${isActive ? '#fff' : 'transparent'};transition:transform .1s`;
+      s.addEventListener("mouseenter", () => { s.style.transform = "scale(1.15)"; });
+      s.addEventListener("mouseleave", () => { s.style.transform = ""; });
+      s.addEventListener("click", () => {
+        selectedColor = color;
+        document.getElementById("acc-color-preview").style.background = color;
+        renderSwatches();
+      });
+      swatchContainer.appendChild(s);
+    });
+  };
+  renderSwatches();
+
+  setTimeout(() => document.getElementById("acc-name")?.focus(), 50);
+
+  const close = () => overlay.remove();
+
+  overlay.addEventListener("keydown", e => {
+    if (e.key === "Escape") close();
+    if (e.key === "Enter" && !["BUTTON","SELECT"].includes(e.target.tagName)) {
+      document.getElementById("acc-save")?.click();
+    }
+  });
+  overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+  document.getElementById("acc-cancel").addEventListener("click", close);
+  document.getElementById("acc-save").addEventListener("click", () => {
+    const name = document.getElementById("acc-name").value.trim();
+    const bank = document.getElementById("acc-bank").value.trim();
+    const amt  = parseFloat(document.getElementById("acc-amount").value.replace(",", "."));
+    if (!name) { toast("L'intitulé du compte est requis"); return; }
+    if (isNaN(amt)) { toast("Le montant est requis"); return; }
+    if (!Array.isArray(D[section])) D[section] = [];
+    D[section].push({ name, bank: bank || "—", amount: amt, color: selectedColor });
+    saveData();
+    close();
+    if (onSaved) onSaved();
+    toast("Compte ajouté ✓");
+  });
+}
+
 function buildAccountTable(section, title) {
+  const inlineInputStyle = "background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:2px 6px;font-size:12px;color:var(--text);outline:none;font-family:var(--font-body)";
+
   const card = document.createElement("div");
   card.className = "card";
 
-  const header = document.createElement("div");
-  header.className = "card-title";
-  header.innerHTML = `<span>${title}</span>`;
-  const addBtn = document.createElement("button");
-  addBtn.className = "btn-icon";
-  addBtn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter`;
-  header.appendChild(addBtn);
-  card.appendChild(header);
+  card.innerHTML = `<div class="card-title"><span>${title}</span></div>`;
 
   const rows = document.createElement("div");
-  rows.className = "account-rows";
   card.appendChild(rows);
 
   const totalRow = document.createElement("div");
-  totalRow.className = "row-total";
-  totalRow.innerHTML = `<span class="label">Total</span><span class="val"></span>`;
+  totalRow.className = "budget-subtotal-row";
+  totalRow.innerHTML = `<span>Total</span><span class="val"></span>`;
   card.appendChild(totalRow);
 
-  // Add form
-  const form = document.createElement("div");
-  form.className = "add-form";
-  form.innerHTML = `
-    <div class="form-row">
-      <input class="form-input full" placeholder="Nom du compte" data-field="name">
-      <input class="form-input" placeholder="Banque" data-field="bank">
-      <input class="form-input" type="number" placeholder="Montant (€)" data-field="amount" step="0.01">
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-ghost btn-sm" data-cancel>Annuler</button>
-      <button class="btn btn-primary btn-sm" data-save>Ajouter</button>
-    </div>`;
-  card.appendChild(form);
+  // Bouton Ajouter (style budget-add-btn) — ouvre une modale
+  const addBtn = document.createElement("button");
+  addBtn.className = "budget-add-btn";
+  addBtn.innerHTML = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter`;
+  card.appendChild(addBtn);
 
-  addBtn.addEventListener("click", () => form.classList.toggle("open"));
-  form.querySelector("[data-cancel]").addEventListener("click", () => form.classList.remove("open"));
-  form.querySelector("[data-save]").addEventListener("click", () => {
-    const name = form.querySelector("[data-field='name']").value.trim();
-    const bank = form.querySelector("[data-field='bank']").value.trim();
-    const amount = parseFloat(form.querySelector("[data-field='amount']").value.replace(",","."));
-    if (!name || isNaN(amount)) return;
-    D[section].push({ name, bank: bank||"—", amount });
-    saveData(); refresh();
-    form.querySelectorAll("input").forEach(i => i.value = "");
-    form.classList.remove("open");
-    toast("Compte ajouté ✓");
-  });
+  addBtn.addEventListener("click", () => openAccountModal(section, title, refresh));
 
   const refresh = () => {
     rows.innerHTML = "";
     D[section].forEach((acc, i) => {
       const row = document.createElement("div");
-      row.className = "account-row";
+      row.className = "budget-item-row";
 
-      const delBtn = document.createElement("button");
-      delBtn.className = "del-btn";
-      delBtn.title = "Supprimer";
-      delBtn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>`;
-      delBtn.addEventListener("click", () => {
-        if (D[section].length <= 1) return toast("Impossible de supprimer le dernier compte");
+      // Color dot — click to open swatch picker
+      const colorDot = document.createElement("span");
+      colorDot.style.cssText = `width:10px;height:10px;border-radius:50%;background:${acc.color || "#888"};flex-shrink:0;cursor:pointer;border:2px solid transparent;transition:outline .12s;display:inline-block;outline:2px solid transparent;outline-offset:1px`;
+      colorDot.title = "Changer la couleur";
+      colorDot.addEventListener("mouseenter", () => { colorDot.style.outline = `2px solid ${acc.color || "#888"}`; });
+      colorDot.addEventListener("mouseleave", () => { colorDot.style.outline = "2px solid transparent"; });
+      colorDot.addEventListener("click", e => {
+        e.stopPropagation();
+        showColorPicker(colorDot, acc.color || "#888", color => {
+          D[section][i].color = color;
+          saveData(); refresh();
+        });
+      });
+
+      // Delete
+      const del = document.createElement("button");
+      del.className = "budget-del-btn";
+      del.title = "Supprimer";
+      del.innerHTML = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>`;
+      del.addEventListener("click", () => {
         D[section].splice(i, 1);
-        saveData(); refresh(); toast("Compte supprimé");
+        saveData(); refresh(); toast("Supprimé");
       });
 
-      const left = document.createElement("div");
-      left.className = "row-left";
-      left.appendChild(delBtn);
-      const nameSpan = document.createElement("span"); nameSpan.className = "row-name"; nameSpan.textContent = acc.name;
-      const bankSpan = document.createElement("span"); bankSpan.className = "row-bank"; bankSpan.textContent = `(${acc.bank})`;
-      left.appendChild(nameSpan); left.appendChild(bankSpan);
-
-      const amtWrap = makeEditableAmount(acc.amount, (v) => {
-        D[section][i].amount = v; saveData(); refresh(); toast("Montant mis à jour ✓");
+      // Name — inline edit
+      const nameEl = document.createElement("span");
+      nameEl.className = "budget-item-name";
+      nameEl.textContent = acc.name; nameEl.title = acc.name;
+      nameEl.addEventListener("click", () => {
+        const inp = document.createElement("input"); inp.type = "text"; inp.value = acc.name;
+        inp.style.cssText = inlineInputStyle + ";width:100%;box-sizing:border-box";
+        nameEl.textContent = ""; nameEl.appendChild(inp); inp.focus(); inp.select();
+        const commit = () => { const v = inp.value.trim(); if (v) { D[section][i].name = v; saveData(); } refresh(); };
+        inp.addEventListener("blur", commit);
+        inp.addEventListener("keydown", e => { if (e.key === "Enter") inp.blur(); if (e.key === "Escape") refresh(); });
       });
 
-      row.appendChild(left); row.appendChild(amtWrap);
+      // Bank badge — inline edit
+      const bankEl = document.createElement("span");
+      bankEl.style.cssText = "font-size:10px;color:var(--text3);flex-shrink:0;padding:1px 7px;border-radius:20px;border:1px solid var(--border2);white-space:nowrap;cursor:pointer;transition:border-color .12s,color .12s";
+      bankEl.textContent = acc.bank || "—";
+      bankEl.addEventListener("mouseenter", () => { bankEl.style.borderColor = "var(--amber)"; bankEl.style.color = "var(--amber)"; });
+      bankEl.addEventListener("mouseleave", () => { bankEl.style.borderColor = ""; bankEl.style.color = ""; });
+      bankEl.addEventListener("click", () => {
+        const inp = document.createElement("input"); inp.type = "text"; inp.value = acc.bank || "";
+        inp.style.cssText = inlineInputStyle + ";width:75px";
+        bankEl.textContent = ""; bankEl.style.cssText = "flex-shrink:0"; bankEl.appendChild(inp); inp.focus(); inp.select();
+        const commit = () => { D[section][i].bank = inp.value.trim() || "—"; saveData(); refresh(); };
+        inp.addEventListener("blur", commit);
+        inp.addEventListener("keydown", e => { if (e.key === "Enter") inp.blur(); if (e.key === "Escape") refresh(); });
+      });
+
+      // Amount — inline edit
+      const amtEl = document.createElement("span");
+      amtEl.className = "budget-item-amount";
+      amtEl.textContent = eur(acc.amount);
+      amtEl.addEventListener("click", () => {
+        const inp = document.createElement("input"); inp.type = "number"; inp.step = "0.01"; inp.value = acc.amount;
+        inp.style.cssText = inlineInputStyle + ";font-family:var(--font-mono);width:90px;text-align:right";
+        amtEl.textContent = ""; amtEl.appendChild(inp); inp.focus(); inp.select();
+        const commit = () => { const v = parseFloat(inp.value); if (!isNaN(v)) { D[section][i].amount = v; saveData(); } refresh(); };
+        inp.addEventListener("blur", commit);
+        inp.addEventListener("keydown", e => { if (e.key === "Enter") inp.blur(); if (e.key === "Escape") refresh(); });
+      });
+
+      row.appendChild(colorDot); row.appendChild(del); row.appendChild(nameEl); row.appendChild(bankEl); row.appendChild(amtEl);
       rows.appendChild(row);
     });
 
-    const total = D[section].reduce((s,a)=>s+a.amount,0);
+    const total = (D[section] || []).reduce((s, a) => s + a.amount, 0);
     totalRow.querySelector(".val").textContent = eur(total);
   };
 

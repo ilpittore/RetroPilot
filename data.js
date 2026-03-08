@@ -4,11 +4,11 @@
 
 const DEFAULTS = {
   compteCourants: [
-    { name: "Compte courant 1 (salaire)", bank: "Fortuneo", amount: 311.34 },
-    { name: "Compte courant 2 (Appart)", bank: "La poste", amount: 88.75 },
-    { name: "Compte courant 3 (PINEL)", bank: "Caisse d'épargne", amount: 229.23 },
-    { name: "Compte courant 4 (auto)", bank: "Fortuneo", amount: 257.63 },
-    { name: "Compte courant 5 (pro)", bank: "Fortuneo", amount: 1628.27 },
+    { name: "Compte courant 1 (salaire)", bank: "Fortuneo",         amount: 311.34,  color: "#5898d8" },
+    { name: "Compte courant 2 (Appart)",  bank: "La poste",         amount: 88.75,   color: "#f0a020" },
+    { name: "Compte courant 3 (PINEL)",   bank: "Caisse d'épargne", amount: 229.23,  color: "#c868a8" },
+    { name: "Compte courant 4 (auto)",    bank: "Fortuneo",         amount: 257.63,  color: "#e87830" },
+    { name: "Compte courant 5 (pro)",     bank: "Fortuneo",         amount: 1628.27, color: "#34c77b" },
   ],
   livrets: [
     { name: "Livret A", bank: "Fortuneo", amount: 11846.95 },
@@ -20,6 +20,19 @@ const DEFAULTS = {
   ],
   enveloppes: { matelas: 10000, economies: 8370.53, factures: 1792.50, projets: 20000 },
   immobilierPerso: 117033.21,
+  liquiditesInvest: [
+    { name: "PEA",     bank: "Trade Republic", amount: 34.59 },
+    { name: "PEA-PME", bank: "Fortuneo",       amount: 126.28 },
+    { name: "CTO 1",   bank: "Trade Republic", amount: 208.83 },
+    { name: "CTO 2",   bank: "IBKR",           amount: 12396.57 },
+  ],
+  immobilierBiens: [
+    { name: "Résidence principale", bank: "La poste", amount: 117033.21 },
+  ],
+  investImmo: [
+    { name: "Locatif (PINEL)", bank: "Caisse d'épargne", amount: 12660.89 },
+  ],
+  investAlternatif: [],
   evolutionCapital: [
     { date: "27/08/2025", patrimoine: 260658.13 },
     { date: "15/09/2025", patrimoine: 264925.26 },
@@ -250,6 +263,7 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(D));
   const el = document.getElementById("sidebar-footer");
   if (el) el.textContent = "Dernière MAJ : " + D.lastUpdated;
+  document.dispatchEvent(new CustomEvent("datachanged"));
 }
 
 let D = loadData();
@@ -269,6 +283,17 @@ function migrateData() {
   // Migrer l'ancien budgetEnvies (scalaire) vers le nouveau format si besoin
   if (D.budgetEnvies != null) { delete D.budgetEnvies; }
   if (D.nextLoanId == null)   D.nextLoanId           = def.nextLoanId;
+  if (!D.liquiditesInvest)  D.liquiditesInvest  = JSON.parse(JSON.stringify(def.liquiditesInvest));
+  if (!D.immobilierBiens) {
+    // Migrate scalar immobilierPerso → immobilierBiens array
+    const scalar = (D.immobilierPerso != null) ? D.immobilierPerso : def.immobilierBiens[0].amount;
+    D.immobilierBiens = [{ name: "Résidence principale", bank: "La poste", amount: scalar }];
+  }
+  if (!D.investImmo)        D.investImmo        = JSON.parse(JSON.stringify(def.investImmo));
+  if (!D.investAlternatif)  D.investAlternatif  = JSON.parse(JSON.stringify(def.investAlternatif));
+  // Auto-assign colors to compteCourants items that don't have one yet
+  const _pal = ["#5898d8","#f0a020","#c868a8","#e87830","#34c77b","#f5c842","#e05050","#5ab4c8","#9b59b6","#1abc9c"];
+  (D.compteCourants || []).forEach((acc, i) => { if (!acc.color) acc.color = _pal[i % _pal.length]; });
   // Sous-clés virements manquantes (si virements existait mais était incomplet)
   const vdef = def.virements;
   const v = D.virements;

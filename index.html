@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://open.er-api.com https://api.frankfurter.app;">
-<title>MonPatrimoine</title>
+<title>RetroPilot</title>
 <link rel="icon" type="image/x-icon" href="retrocosmo.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -16,8 +16,10 @@
   <!-- Sidebar -->
   <aside id="sidebar">
     <div id="sidebar-logo">
-      <div class="logo-mark">M</div>
-      <span class="logo-text">MonPatrimoine</span>
+      <div class="logo-mark">
+        <img src="logo.png" alt="MonPatrimoine" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">
+      </div>
+      <span class="logo-text">RetroPilot</span>
     </div>
     <nav id="nav">
       <div class="nav-item active" data-page="dashboard">
@@ -64,7 +66,7 @@
 
   <div id="main">
     <div id="topbar">
-      <button id="menu-btn" onclick="toggleSidebar()">
+      <button id="menu-btn">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <h2 id="page-title">Dashboard</h2>
@@ -77,17 +79,17 @@
 <div id="toast"></div>
 
 <!-- Scripts — ordre important -->
-<script src="data.js"></script>
-<script src="utils.js"></script>
-<script src="pages/dashboard.js"></script>
-<script src="pages/patrimoine.js"></script>
-<script src="pages/budget.js"></script>
-<script src="pages/livret.js"></script>
-<script src="pages/virements.js"></script>
-<script src="pages/investissements.js"></script>
-<script src="pages/credits.js"></script>
-<script src="pages/depenses.js"></script>
-<script src="pages/parametres.js"></script>
-<script src="main.js"></script>
+<script src="data.js?v=2"></script>
+<script src="utils.js?v=2"></script>
+<script src="pages/dashboard.js?v=2"></script>
+<script src="pages/patrimoine.js?v=3"></script>
+<script src="pages/budget.js?v=5"></script>
+<script src="pages/livret.js?v=5"></script>
+<script src="pages/virements.js?v=2"></script>
+<script src="pages/investissements.js?v=2"></script>
+<script src="pages/credits.js?v=2"></script>
+<script src="pages/depenses.js?v=2"></script>
+<script src="pages/parametres.js?v=2"></script>
+<script src="main.js?v=2"></script>
 </body>
 </html>
