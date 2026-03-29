@@ -3,7 +3,7 @@ name: Build RetroPilot
 on:
   push:
     tags:
-      - 'v*'   # Se déclenche quand tu pousses un tag genre v1.0.0
+      - 'v*'
 
 jobs:
   build-mac:
@@ -20,6 +20,8 @@ jobs:
         run: npm install
 
       - name: Build .dmg (Mac)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run build:mac
 
       - name: Upload .dmg
@@ -42,6 +44,8 @@ jobs:
         run: npm install
 
       - name: Build .exe (Windows)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run build:win
 
       - name: Upload .exe
@@ -50,7 +54,6 @@ jobs:
           name: RetroPilot-win
           path: dist/*.exe
 
-  # Créer une Release GitHub avec les deux fichiers
   release:
     needs: [build-mac, build-win]
     runs-on: ubuntu-latest
@@ -72,4 +75,4 @@ jobs:
         with:
           files: dist/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
