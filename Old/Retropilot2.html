@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file:; connect-src 'self' https://open.er-api.com https://api.frankfurter.app https://api.binance.com https://corsproxy.io https://api.allorigins.win https://query1.finance.yahoo.com https://query2.finance.yahoo.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://open.er-api.com https://api.frankfurter.app https://api.binance.com https://corsproxy.io https://api.allorigins.win https://query1.finance.yahoo.com https://query2.finance.yahoo.com;">
 <title>RetroPilot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -109,17 +109,15 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--text);
   transition: width .25s ease, transform .25s ease;
   z-index: 50; overflow: hidden;
 }
-#sidebar-logo {
   height: var(--header-h);
   display: flex; align-items: center;
   padding: 0 18px; border-bottom: 1px solid var(--border); gap: 10px;
-  flex-shrink: 0; overflow: hidden;
 }
 #sidebar-logo .logo-mark {
   width: 28px; height: 28px; background: var(--amber); border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-head); font-weight:600; font-size:var(--text-md);
-  color: #0f0e0c; flex-shrink: 0; overflow: hidden;
+  color: #0f0e0c; flex-shrink: 0;
 }
 #sidebar-logo .logo-text { font-family: var(--font-head); font-weight:600; font-size:var(--text-lg); color: var(--text); letter-spacing: -.3px; }
 nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
@@ -168,7 +166,7 @@ nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
 .card-title .hint { font-weight:600; font-size:var(--text-md); color: var(--text3); }
 
 /* ── Grids ─────────────────────────────────────────────────────────────── */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
@@ -418,9 +416,6 @@ tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom:
 .amort-table td:first-child { color: var(--text); }
 .amort-table tbody tr.current-row td { background: #f0a02012; color: var(--text); }
 .amort-table tbody tr.current-row td:first-child { color: var(--amber); font-weight:600; }
-.amort-table tbody tr.phase-prefunding td:first-child { border-left: 2px solid #5898d8; }
-.amort-table tbody tr.phase-deferred td:first-child { border-left: 2px solid var(--amber); }
-.amort-table tbody tr.phase-amort td:first-child { border-left: 2px solid var(--gain); }
 .amort-table tfoot td { background: var(--surface2); border-top: 2px solid var(--border2); }
 
 /* Formulaire crédit */
@@ -469,7 +464,7 @@ tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom:
 }
 .form-group .form-hint { font-size:var(--text-md); color: var(--text); }
 .form-group.full { grid-column: 1 / -1; }
-.form-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+.form-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
 .credit-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .credit-action-btn.danger:hover { color: var(--loss) !important; border-color: var(--loss) !important; background: var(--loss)18; }
 
@@ -866,7 +861,7 @@ tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom:
       </div>
       <div class="nav-item" data-page="investissements">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-        Bourse
+        Investissements
       </div>
       <div class="nav-item" data-page="credits">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
@@ -884,7 +879,7 @@ tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom:
         if (el) el.classList.add("active");
       })();
     </script>
-    <div class="nav-item" data-page="parametres">
+    <div class="nav-item" data-page="parametres" style="border-top:1px solid var(--border)">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       Paramètres
     </div>
@@ -976,10 +971,8 @@ const DEFAULTS = {
   livretMouvements: [],
   analyseTypes: ["Dépenses essentielles","Dépenses plaisir","Investissements"],
   analyseDepenses: [],
-  evolutionCapital: [],
   virements: {
     salaireMensuel: 0,
-    revenusComplementaires: [],
     comptesCourants: [
       { name:"Compte courant 1 (salaire)", bank:"Fortuneo",        actif:true,  montant:0 },
       { name:"Compte courant 2 (Appart)",  bank:"La Poste",        actif:true,  montant:0 },
@@ -1034,49 +1027,122 @@ let D = loadData();
 // Migration : garantit que toutes les clés existent même sur des données anciennes
 function migrateData() {
   const def = DEFAULTS;
-  const cloneArr = k => JSON.parse(JSON.stringify(def[k]));
-
-  // ── Clés de premier niveau ───────────────────────────────────────────────
-  if (!D.virements)          D.virements          = cloneArr('virements');
-  if (!D.livretEnveloppes)   D.livretEnveloppes   = cloneArr('livretEnveloppes');
-  if (!D.livretMouvements)   D.livretMouvements   = cloneArr('livretMouvements');
-  if (!D.analyseDepenses)    D.analyseDepenses    = cloneArr('analyseDepenses');
-  if (!D.evolutionCapital)   D.evolutionCapital   = [];
-  if (!D.analyseCats)        D.analyseCats        = [...def.analyseCats];
-  if (!D.analyseTypes)       D.analyseTypes       = [...def.analyseTypes];
-  if (!D.budgetEnviesMensu)  D.budgetEnviesMensu  = cloneArr('budgetEnviesMensu');
-  if (!D.budgetEnviesAnnuel) D.budgetEnviesAnnuel = cloneArr('budgetEnviesAnnuel');
-  if (D.nextLoanId == null)  D.nextLoanId         = def.nextLoanId;
-  if (!D.banks || !D.banks.length) D.banks = [
+  // Clés de premier niveau manquantes
+  if (!D.virements)           D.virements           = JSON.parse(JSON.stringify(def.virements));
+  if (!D.livretEnveloppes)   D.livretEnveloppes   = JSON.parse(JSON.stringify(def.livretEnveloppes));
+  if (!D.livretMouvements)   D.livretMouvements   = JSON.parse(JSON.stringify(def.livretMouvements));
+  if (!D.analyseDepenses)  D.analyseDepenses  = JSON.parse(JSON.stringify(def.analyseDepenses));
+  if (!D.analyseCats)      D.analyseCats      = [...def.analyseCats];
+  if (!D.analyseTypes)     D.analyseTypes     = [...def.analyseTypes];
+  if (!D.budgetEnviesMensu)  D.budgetEnviesMensu  = JSON.parse(JSON.stringify(def.budgetEnviesMensu));
+  if (!D.budgetEnviesAnnuel) D.budgetEnviesAnnuel = JSON.parse(JSON.stringify(def.budgetEnviesAnnuel));
+  // Migrer l'ancien budgetEnvies (scalaire) vers le nouveau format si besoin
+  if (D.budgetEnvies != null) { delete D.budgetEnvies; }
+  if (D.nextLoanId == null)   D.nextLoanId           = def.nextLoanId;
+  const defaultBanks = [
     {name:"Fortuneo",color:"#5898d8"},{name:"La Poste",color:"#f0c020"},
     {name:"Caisse d'épargne",color:"#34c77b"},{name:"Amundi",color:"#e87830"},
     {name:"Trade Republic",color:"#c868a8"},{name:"Binance",color:"#f5c842"},
     {name:"Ledger",color:"#5ab4c8"},{name:"IBKR",color:"#e05050"}
   ];
-  if (!D.liquiditesInvest)  D.liquiditesInvest  = cloneArr('liquiditesInvest');
-  if (!D.cryptoAccounts)    D.cryptoAccounts    = [];
-  if (!D.investCategories)  D.investCategories  = cloneArr('investCategories');
-  if (!D.immobilierBiens)   D.immobilierBiens   = [{ id: Date.now(), name: "Résidence principale", bank: "—", valeurAchat: 0 }];
-  if (!D.investImmo)        D.investImmo        = cloneArr('investImmo');
-  if (!D.investAlternatif)  D.investAlternatif  = cloneArr('investAlternatif');
-  if (!D.livretAssociations) D.livretAssociations = { matelas: null, economies: null, factures: null };
-
-  // ── Sous-clés virements ──────────────────────────────────────────────────
+  if (!D.banks || !D.banks.length) { D.banks = defaultBanks; }
+  // Migration string[] → {name,color}[]
+  else if (typeof D.banks[0] === "string") {
+    const palette = ["#5898d8","#f0c020","#34c77b","#e87830","#c868a8","#f5c842","#5ab4c8","#e05050","#9b59b6","#1abc9c"];
+    D.banks = D.banks.map((b,i) => ({ name: b, color: palette[i % palette.length] }));
+  }
+  if (!D.liquiditesInvest)  D.liquiditesInvest  = JSON.parse(JSON.stringify(def.liquiditesInvest));
+  if (!D.cryptoAccounts) D.cryptoAccounts = [];
+  if (!D.investCategories) D.investCategories = JSON.parse(JSON.stringify(def.investCategories));
+  // Migration : convertir les catégories string en objets {name, target}
+  ["etf","actions","crypto"].forEach(k => {
+    if (D.investCategories[k]) {
+      D.investCategories[k] = D.investCategories[k].map(c => typeof c === "string" ? {name:c, target:0} : c);
+    }
+  });
+  if (D.cryptoAccounts.length === 0) {
+    D.cryptoAccounts = [
+      { name: "Compte crypto 1", bank: (D.banks[0]||{name:"—"}).name, amount: 0, currency: "EUR" },
+      { name: "Compte crypto 2", bank: (D.banks[0]||{name:"—"}).name, amount: 0, currency: "EUR" },
+    ];
+  }
+  // Ajouter currency manquante sur les liquiditesInvest existantes
+  (D.liquiditesInvest||[]).forEach(a => { if (!a.currency) a.currency = "EUR"; });
+  // Ajouter Assu Vie 1 et 2 si absents
+  const liNames = (D.liquiditesInvest||[]).map(a => a.name);
+  if (!liNames.includes("Assu Vie 1")) D.liquiditesInvest.push({ name:"Assu Vie 1", bank: (D.banks[0]||{name:"—"}).name, amount:0, currency:"EUR" });
+  if (!liNames.includes("Assu Vie 2")) D.liquiditesInvest.push({ name:"Assu Vie 2", bank: (D.banks[0]||{name:"—"}).name, amount:0, currency:"EUR" });
+  if (!D.immobilierBiens) {
+    const scalar = (D.immobilierPerso != null) ? D.immobilierPerso : 0;
+    D.immobilierBiens = [{ id: Date.now(), name: "Résidence principale", bank: "—", valeurAchat: scalar }];
+  }
+  // Migration : anciens biens sans id ou valeurAchat
+  D.immobilierBiens.forEach((b, i) => {
+    if (!b.id) b.id = Date.now() + i;
+    if (b.valeurAchat == null) b.valeurAchat = b.amount || 0;
+  });
+  if (!D.investImmo)        D.investImmo        = JSON.parse(JSON.stringify(def.investImmo));
+  if (!D.investAlternatif)  D.investAlternatif  = JSON.parse(JSON.stringify(def.investAlternatif));
+  // Auto-assign colors to compteCourants items that don't have one yet
+  const _pal = ["#5898d8","#f0a020","#c868a8","#e87830","#34c77b","#f5c842","#e05050","#5ab4c8","#9b59b6","#1abc9c"];
+  (D.compteCourants || []).forEach((acc, i) => { if (!acc.color) acc.color = _pal[i % _pal.length]; });
+  // Sous-clés virements manquantes (si virements existait mais était incomplet)
   const vdef = def.virements;
   const v = D.virements;
-  if (!v.revenusComplementaires) v.revenusComplementaires = [];
-  if (!v.investissementsRep)     v.investissementsRep     = {};
-  if (v.moisMatelas   == null)   v.moisMatelas   = vdef.moisMatelas;
-  if (v.hasDettes     == null)   v.hasDettes     = vdef.hasDettes;
-  if (v.dettesMontant == null)   v.dettesMontant = vdef.dettesMontant;
-  if (v.dcaETF        == null)   v.dcaETF        = vdef.dcaETF;
-  if (v.dcaActions    == null)   v.dcaActions    = vdef.dcaActions;
-  if (v.dcaCrypto     == null)   v.dcaCrypto     = vdef.dcaCrypto;
-  if (v.arrondis      == null)   v.arrondis      = {};
+  if (!v.comptesCourants)    v.comptesCourants    = JSON.parse(JSON.stringify(vdef.comptesCourants));
+  if (!v.livrets)            v.livrets            = JSON.parse(JSON.stringify(vdef.livrets));
+  if (!v.investissements)    v.investissements    = JSON.parse(JSON.stringify(vdef.investissements));
+  if (v.salaireMensuel == null) v.salaireMensuel  = vdef.salaireMensuel;
+  if (v.moisMatelas    == null) v.moisMatelas     = vdef.moisMatelas;
+  if (v.hasDettes      == null) v.hasDettes       = vdef.hasDettes;
+  if (v.dettesMontant  == null) v.dettesMontant   = vdef.dettesMontant;
+  if (v.dcaETF         == null) v.dcaETF          = vdef.dcaETF;
+  if (v.dcaActions     == null) v.dcaActions      = vdef.dcaActions;
+  if (v.dcaCrypto      == null) v.dcaCrypto       = vdef.dcaCrypto;
+  if (v.dcaImmo        == null) v.dcaImmo         = vdef.dcaImmo;
+  if (v.dcaAlternatif  == null) v.dcaAlternatif   = 0;
+  // Association livrets réels → enveloppes (pour Virements livrets)
+  if (!D.livretAssociations) D.livretAssociations = { matelas: null, economies: null, factures: null };
+  // Migration : supprimer l'enveloppe "projets" si elle existe encore
+  if (D.livretEnveloppes) D.livretEnveloppes = D.livretEnveloppes.filter(e => e.id !== "projets");
+  if (D.livretAssociations && "projets" in D.livretAssociations) delete D.livretAssociations.projets;
+  if (D.virements?.enveloppes && "projets" in D.virements.enveloppes) delete D.virements.enveloppes.projets;
+  // Migration : mettre à jour les couleurs et l'ordre des enveloppes
+  const ENV_COLORS = { factures:"#e87830", economies:"#c868a8", matelas:"#34c77b" };
+  const ENV_ORDER  = ["factures","economies","matelas"];
+  if (D.livretEnveloppes) {
+    D.livretEnveloppes.forEach(e => { if (ENV_COLORS[e.id]) e.color = ENV_COLORS[e.id]; });
+    D.livretEnveloppes.sort((a,b) => ENV_ORDER.indexOf(a.id) - ENV_ORDER.indexOf(b.id));
+  }
 
-  // ── Synchronisation couleurs comptes ────────────────────────────────────
-  const getBankColor = name => (D.banks||[]).find(b => b.name === name)?.color || "#888";
-  if (D.comptes) D.comptes.forEach(c => { c.color = getBankColor(c.bank); });
+  // Migration : unification des comptes dans D.comptes
+  if (!D.comptes) {
+    const getBankColor = (bankName) => (D.banks||[]).find(b => b.name === bankName)?.color || "#888";
+    D.comptes = [];
+    (D.compteCourants||[]).forEach(a => D.comptes.push({
+      type:"cc", name:a.name, bank:a.bank||"—", amount:a.amount||0, currency:a.currency||"EUR", color:getBankColor(a.bank)
+    }));
+    (D.livrets||[]).forEach(a => D.comptes.push({
+      type:"livret", name:a.name, bank:a.bank||"—", amount:a.amount||0, currency:a.currency||"EUR", color:getBankColor(a.bank)
+    }));
+    (D.plansEpargne||[]).forEach(a => D.comptes.push({
+      type:"plan_epargne", name:a.name, bank:a.bank||"—", amount:a.amount||0, currency:a.currency||"EUR", color:getBankColor(a.bank)
+    }));
+    (D.liquiditesInvest||[]).forEach(a => D.comptes.push({
+      type:"invest-titres", name:a.name, bank:a.bank||"—", amount:a.amount||0, currency:a.currency||"EUR", color:getBankColor(a.bank)
+    }));
+    (D.cryptoAccounts||[]).forEach(a => D.comptes.push({
+      type:"invest-crypto", name:a.name, bank:a.bank||"—", amount:a.amount||0, currency:a.currency||"EUR", color:getBankColor(a.bank)
+    }));
+    (D.investAlternatif||[]).forEach(a => D.comptes.push({
+      type:"alternatif", name:a.name, bank:a.bank||"—", amount:a.amount||0, currency:a.currency||"EUR", color:getBankColor(a.bank)
+    }));
+  }
+  // Synchronisation : couleur toujours depuis la banque
+  if (D.comptes) {
+    const getBankColor = (bankName) => (D.banks||[]).find(b => b.name === bankName)?.color || "#888";
+    D.comptes.forEach(c => { c.color = getBankColor(c.bank); });
+  }
 }
 migrateData();
 saveData(); // Persiste les valeurs par défaut/migrées dès le premier chargement
@@ -1093,7 +1159,7 @@ const PAGES = {
   livret:          { title:"Enveloppes" },
   avancement:      { title:"Avancement" },
   virements:       { title:"Virements" },
-  investissements: { title:"Bourse" },
+  investissements: { title:"Investissements" },
   credits:         { title:"Crédits" },
   analyse:         { title:"Analyse des dépenses" },
   parametres:      { title:"Paramètres" },
@@ -1127,59 +1193,6 @@ const sum = (arr, key) => arr.reduce((s,x) => s + (x[key]||0), 0);
 // COMPUTED
 // ═══════════════════════════════════════════════════════════════
 
-// ── Valeur nette d'un bien pondérée par la détention ─────────────────────────
-function bienValNette(bien, loan) {
-  const det = (bien.detention ?? 100) / 100;
-  if (loan) return loanKPIs(loan).valeurNette * det;
-  return (bien.valeurAchat ?? bien.amount ?? 0) * det;
-}
-function bienValBrute(bien) {
-  return (bien.valeurAchat ?? bien.amount ?? 0) * ((bien.detention ?? 100) / 100);
-}
-
-// ── Modale "Reste à vivre négatif" ────────────────────────────────────────
-function openResteNegatifModal() {
-  const B = computeBudget();
-  const resteVal = B.salaire - B.essentiel - B.invest - B.envies;
-  const overlay = document.createElement("div");
-  overlay.style.cssText = "position:fixed;inset:0;background:#00000088;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px";
-  overlay.innerHTML = `
-    <div style="background:var(--surface);border:1px solid #e0505055;border-radius:var(--radius);padding:0;width:100%;max-width:360px;animation:fadeUp .2s ease">
-      <div class="card-title" style="color:var(--loss)">⚠ Reste à vivre négatif</div>
-      <div style="padding:6px 20px 20px">
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Salaire net</span>
-          <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">${eur(B.salaire)}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Dépenses essentielles</span>
-          <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">− ${eur(B.essentiel)}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Investissements</span>
-          <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">− ${eur(B.invest)}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Envies / Projets</span>
-          <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">− ${eur(B.envies)}</span>
-        </div>
-        <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between">
-          <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--loss)">Reste à vivre</span>
-          <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--loss)">${eur(resteVal)}</span>
-        </div>
-      </div>
-      <p style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text);line-height:1.6;margin-bottom:16px">Vos dépenses dépassent votre salaire net. Réduisez vos dépenses essentielles, vos envies ou votre montant d'investissement.</p>
-      <div style="text-align:right">
-        <button class="app-btn app-btn--rect" id="budget-warn-close">Fermer</button>
-      </div>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  overlay.addEventListener("pointerdown", e => { if (e.target === overlay) overlay.remove(); });
-  overlay.querySelector("#budget-warn-close").addEventListener("click", () => overlay.remove());
-}
-
 function computePatrimoine() {
   const ccTotal    = sum(D.compteCourants, "amount");
   const liInvTotal = sum(D.liquiditesInvest || [], "amount");
@@ -1191,26 +1204,25 @@ function computePatrimoine() {
   const cryMkt     = sum(D.cryptoPositions, "market");
   const investImmoTotal = (D.investImmo||[]).reduce((s, bien) => {
     const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
-    return s + bienValNette(bien, loan);
+    const val = loan ? loanKPIs(loan).valeurNette : (bien.valeurAchat ?? bien.amount ?? 0);
+    return s + val;
   }, 0);
   const alternatif      = sum(D.investAlternatif || [], "amount");
-  const bourse     = etfMkt + stkMkt + cryMkt;
+  const invest     = etfMkt + stkMkt + cryMkt + investImmoTotal + alternatif;
   const immoTotal  = (D.immobilierBiens||[]).reduce((s, bien) => {
     const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
-    return s + bienValNette(bien, loan);
+    const cap = loan ? loanKPIs(loan).capitalRestantADate : 0;
+    return s + (bien.valeurAchat ?? bien.amount ?? 0) - cap;
   }, 0);
-  const immoTotalFull = immoTotal + investImmoTotal;
-  const invest     = bourse + investImmoTotal + alternatif;
   const total      = cash + livrets + plans + immoTotal + invest;
   const cats = [
-    { label:"Cash",           amount:cash,          color:"#5898d8" },
-    { label:"Livrets",        amount:livrets,       color:"#34c77b" },
-    { label:"Plans épargne",  amount:plans,         color:"#f5c842" },
-    { label:"Immobilier",     amount:immoTotalFull, color:"#e87830" },
-    { label:"Bourse",         amount:bourse,        color:"#c868a8" },
-    { label:"Autres",         amount:alternatif,    color:"#9b59b6" },
-  ].filter(c => c.amount > 0).map(c => ({...c, pct: total>0?(c.amount/total*100):0}));
-  return { cash, ccTotal, liInvTotal, livrets, plans, etfMkt, stkMkt, cryMkt, investImmoTotal, alternatif, bourse, invest, immoTotal, immoTotalFull, total, cats };
+    { label:"Cash",           amount:cash,     color:"#5898d8" },
+    { label:"Livrets",        amount:livrets,  color:"#34c77b" },
+    { label:"Plans épargne",  amount:plans,    color:"#f5c842" },
+    { label:"Immobilier",     amount:immoTotal,color:"#e87830" },
+    { label:"Investissements",amount:invest,   color:"#c868a8" },
+  ].map(c => ({...c, pct: total>0?(c.amount/total*100):0}));
+  return { cash, ccTotal, liInvTotal, livrets, plans, etfMkt, stkMkt, cryMkt, investImmoTotal, alternatif, invest, immoTotal, total, cats };
 }
 
 function computeBudget() {
@@ -1221,7 +1233,7 @@ function computeBudget() {
   const enviesAnnuel = (D.budgetEnviesAnnuel || []).reduce((s,x) => s + x.amount, 0) / 12;
   const envies = enviesMensu + enviesAnnuel;
   const invest = D.budgetInvestissement || 0;
-  const salaire = (D.virements?.revenusComplementaires || []).reduce((s,r) => s + (r.amount||0), 0);
+  const salaire = (D.virements && D.virements.salaireMensuel) || 0;
   const resteAVivre = salaire - essentiel - envies - invest;
   return { essentielMensu, essentielAnnuel, essentiel, enviesMensu, enviesAnnuel, envies, invest, salaire, resteAVivre };
 }
@@ -1780,7 +1792,7 @@ function drawEvoChart(container) {
   const pts = (D.evolutionCapital || []);
   if (pts.length < 2) { container.innerHTML = `<p style="color:var(--text3);text-align:center;padding:30px 0">Aucun historique disponible</p>`; return; }
 
-  const W = container.clientWidth || container.parentElement?.clientWidth || 600;
+  const W = container.clientWidth || 600;
   const H = 180;
   const PAD = { top:20, right:20, bottom:30, left:70 };
   const w = W - PAD.left - PAD.right;
@@ -1834,7 +1846,7 @@ function drawEvoChart(container) {
 function dashboard(c) {
   const P = computePatrimoine();
   const B = computeBudget();
-  const totalDebt = D.loans.reduce((s,l) => s + loanKPIs(l).capitalRestantADate, 0);
+  const totalDebt = D.loans.reduce((s,l)=>s+l.remaining, 0);
   const etfMkt = sum(D.etfPositions,"market"), etfCost = sum(D.etfPositions,"cost");
   const stkMkt = sum(D.stockPositions,"market");
   const cryMkt = sum(D.cryptoPositions,"market"), cryCost = sum(D.cryptoPositions,"cost");
@@ -1842,21 +1854,17 @@ function dashboard(c) {
   const investCost = sum(D.etfPositions,"cost")+sum(D.stockPositions,"cost")+sum(D.cryptoPositions,"cost");
   const investPerf = (investMkt/investCost-1)*100;
 
-  const matelasActuelDash = livretComputeSoldes()['matelas'] || 0;
-  const cibleMatelasV     = (D.virements?.moisMatelas || 6) * computeBudget().essentiel;
-  const matelasOk         = matelasActuelDash >= cibleMatelasV && cibleMatelasV > 0;
-
   const sg = document.createElement("div"); sg.className = "stats-grid";
   const stats = [
-    { label:"Patrimoine total", value:eur(P.total), sub:"Actifs nets", trend:null, subColor:null, icon:`<path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>` },
-    { label:"Bourse", value:eur(investMkt), sub:pct(investPerf), trend:investPerf, subColor:null, icon:`<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>` },
-    { label:"Épargne sécurité", value:eur(matelasActuelDash), sub: matelasOk ? "Matelas constitué ✓" : "Matelas non constitué", trend:null, subColor: matelasOk ? "var(--gain)" : "var(--loss)", icon:`<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>` },
-    { label:"Dettes restantes", value:eur(totalDebt), sub:`${D.loans.length} crédit${D.loans.length>1?"s":""} immobilier${D.loans.length>1?"s":""}`, trend:null, subColor:null, icon:`<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>` },
+    { label:"Patrimoine total", value:eur(P.total), sub:"Actifs nets", trend:null, icon:`<path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>` },
+    { label:"Investissements", value:eur(investMkt), sub:pct(investPerf), trend:investPerf, icon:`<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>` },
+    { label:"Épargne sécurité", value:eur(D.enveloppes.matelas), sub:"Matelas constitué ✓", trend:null, icon:`<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>` },
+    { label:"Dettes restantes", value:eur(totalDebt), sub:`${D.loans.length} crédits immo`, trend:null, icon:`<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>` },
   ];
   stats.forEach((s,i) => {
     const el = document.createElement("div");
     el.className = "card"; el.style.animationDelay = (i*0.06)+"s";
-    const trendHtml = s.trend !== null ? `<div class="stat-trend ${s.trend>=0?'up':'down'}">${pct(s.trend)}</div>` : `<div class="stat-sub" style="${s.subColor ? 'color:'+s.subColor : ''}">${s.sub}</div>`;
+    const trendHtml = s.trend !== null ? `<div class="stat-trend ${s.trend>=0?'up':'down'}">${pct(s.trend)}</div>` : `<div class="stat-sub">${s.sub}</div>`;
     el.innerHTML = `<div class="card-title">
         <span style="display:flex;align-items:center;gap:8px">
           <span class="stat-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${s.icon}</svg></span>
@@ -1872,174 +1880,11 @@ function dashboard(c) {
   const row1 = document.createElement("div"); row1.className = "grid-2"; row1.style.animationDelay = ".1s";
 
   const evoCard = document.createElement("div"); evoCard.className = "card";
-
-  const evoHeader = document.createElement("div");
-  evoHeader.className = "card-title";
-  evoHeader.style.marginBottom = "0";
-  evoHeader.innerHTML = `
-    <span>Évolution du patrimoine</span>
-    <div style="display:flex;gap:6px;margin-left:auto">
-      <button id="evo-edit-btn" class="app-btn app-btn--rect" title="Gérer les données" style="padding:4px 8px">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      </button>
-      <button id="evo-add-btn" class="app-btn app-btn--rect app-btn--primary" title="Enregistrer la valeur actuelle" style="padding:4px 8px">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-    </div>`;
-  evoCard.appendChild(evoHeader);
-
+  evoCard.innerHTML = `<div class="card-title">Évolution du patrimoine</div>`;
   const evoChart = document.createElement("div");
-  evoChart.style.marginTop = "16px";
   evoCard.appendChild(evoChart);
   row1.appendChild(evoCard);
-  setTimeout(() => drawEvoChart(evoChart), 150);
-
-  // ── Bouton + : saisie date + montant ──
-  evoCard.querySelector('#evo-add-btn').addEventListener("click", () => {
-    const P = computePatrimoine();
-    const today = new Date();
-    const todayStr = String(today.getDate()).padStart(2,'0') + '/' + String(today.getMonth()+1).padStart(2,'0') + '/' + today.getFullYear();
-    // Format YYYY-MM-DD for input[type=date]
-    const todayISO = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-
-    const overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px";
-    overlay.innerHTML = `
-      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:0;width:100%;max-width:380px;animation:fadeUp .2s ease">
-        <div class="card-title">Ajouter une valeur</div>
-        <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:14px">
-          <div class="form-group">
-            <label>Date</label>
-            <input class="form-input" id="evo-input-date" type="date" value="${todayISO}">
-          </div>
-          <div class="form-group">
-            <label>Patrimoine total (€)</label>
-            <input class="form-input" id="evo-input-val" type="number" step="100" value="${Math.round(P.total)}">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button class="app-btn app-btn--rect" id="evo-cancel">Annuler</button>
-            <button class="app-btn app-btn--rect app-btn--primary" id="evo-confirm">Enregistrer</button>
-          </div>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-
-    overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
-    overlay.querySelector('#evo-cancel').addEventListener("click", () => overlay.remove());
-    overlay.querySelector('#evo-confirm').addEventListener("click", () => {
-      const dateInput = overlay.querySelector('#evo-input-date').value;
-      const valInput  = parseFloat(overlay.querySelector('#evo-input-val').value) || 0;
-      if (!dateInput || valInput <= 0) { toast('Date et montant obligatoires'); return; }
-      const d = new Date(dateInput);
-      const dateStr = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
-      if (!D.evolutionCapital) D.evolutionCapital = [];
-      const idx = D.evolutionCapital.findIndex(p => p.date === dateStr);
-      if (idx >= 0) {
-        D.evolutionCapital[idx].patrimoine = valInput;
-      } else {
-        D.evolutionCapital.push({ date: dateStr, patrimoine: valInput });
-        D.evolutionCapital.sort((a,b) => {
-          const parse = s => { const [dd,mm,yy] = s.split('/'); return new Date(yy,mm-1,dd); };
-          return parse(a.date) - parse(b.date);
-        });
-      }
-      saveData();
-      overlay.remove();
-      drawEvoChart(evoChart);
-      toast("Valeur enregistrée ✓");
-    });
-  });
-
-  // ── Bouton engrenage : tableau d'édition ──
-  evoCard.querySelector('#evo-edit-btn').addEventListener("click", () => {
-    const overlay = document.createElement("div");
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px";
-    document.body.appendChild(overlay);
-
-    const renderEditModal = () => {
-      const pts = D.evolutionCapital || [];
-      overlay.innerHTML = `
-        <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:0;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;animation:fadeUp .2s ease">
-          <div class="card-title" style="flex-shrink:0">Historique du patrimoine</div>
-          <div style="overflow-y:auto;flex:1">
-            ${pts.length === 0 ? `<p style="color:var(--text3);text-align:center;padding:30px">Aucune donnée enregistrée</p>` : `
-            <table style="width:100%;border-collapse:collapse">
-              <thead>
-                <tr>
-                  <th style="text-align:left;padding:8px 20px;font-size:var(--text-sm);color:var(--text2);font-family:var(--font-head);font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border2)">Date</th>
-                  <th style="text-align:right;padding:8px 20px;font-size:var(--text-sm);color:var(--text2);font-family:var(--font-head);font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border2)">Patrimoine</th>
-                  <th style="padding:8px 12px;border-bottom:1px solid var(--border2)"></th>
-                </tr>
-              </thead>
-              <tbody id="evo-edit-tbody">
-                ${pts.map((p, i) => `
-                  <tr style="border-bottom:1px solid var(--border)" id="evo-row-${i}">
-                    <td style="padding:8px 20px;font-family:var(--font-mono);color:var(--text);font-size:var(--text-md)">${p.date}</td>
-                    <td style="padding:8px 20px;text-align:right;font-family:var(--font-mono);color:var(--amber);font-weight:600;font-size:var(--text-md)">${eur(p.patrimoine)}</td>
-                    <td style="padding:8px 12px;text-align:right">
-                      <button class="app-btn app-btn--rect edit-btn" data-idx="${i}" style="padding:3px 8px" title="Modifier">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg>
-                      </button>
-                    </td>
-                  </tr>`).join('')}
-              </tbody>
-            </table>`}
-          </div>
-          <div style="padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0">
-            <button class="app-btn app-btn--rect" style="width:100%" id="evo-edit-close">Fermer</button>
-          </div>
-        </div>`;
-
-      overlay.querySelector('#evo-edit-close').addEventListener('click', () => { overlay.remove(); drawEvoChart(evoChart); });
-      overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.remove(); drawEvoChart(evoChart); } });
-
-      overlay.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = parseInt(btn.dataset.idx);
-          const entry = D.evolutionCapital[idx];
-          const editOverlay = document.createElement('div');
-          editOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;display:flex;align-items:center;justify-content:center;padding:16px';
-          editOverlay.innerHTML = `
-            <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:0;width:100%;max-width:360px;animation:fadeUp .2s ease">
-              <div class="card-title">Modifier l'entrée</div>
-              <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:12px">
-                <div class="form-group">
-                  <label>Date (JJ/MM/AAAA)</label>
-                  <input class="form-input" id="evo-edit-date" type="text" value="${entry.date}" placeholder="01/01/2024">
-                </div>
-                <div class="form-group">
-                  <label>Patrimoine (€)</label>
-                  <input class="form-input" id="evo-edit-val" type="number" step="100" value="${entry.patrimoine}">
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-                  <button class="app-btn app-btn--rect" style="color:var(--loss);background:var(--loss)12;border-color:var(--loss)45" id="evo-del">Supprimer</button>
-                  <button class="app-btn app-btn--rect" id="evo-edit-cancel">Annuler</button>
-                  <button class="app-btn app-btn--rect app-btn--primary" id="evo-edit-save">Enregistrer</button>
-                </div>
-              </div>
-            </div>`;
-          document.body.appendChild(editOverlay);
-
-          editOverlay.querySelector('#evo-edit-cancel').addEventListener('click', () => editOverlay.remove());
-          editOverlay.addEventListener('click', e => { if (e.target === editOverlay) editOverlay.remove(); });
-          editOverlay.querySelector('#evo-del').addEventListener('click', () => {
-            confirmModal('Supprimer cette entrée ?', '', () => {
-              D.evolutionCapital.splice(idx, 1);
-              saveData(); editOverlay.remove(); renderEditModal();
-            });
-          });
-          editOverlay.querySelector('#evo-edit-save').addEventListener('click', () => {
-            const newDate = editOverlay.querySelector('#evo-edit-date').value.trim();
-            const newVal  = parseFloat(editOverlay.querySelector('#evo-edit-val').value) || 0;
-            if (!newDate || newVal <= 0) { toast('Date et valeur obligatoires'); return; }
-            D.evolutionCapital[idx] = { date: newDate, patrimoine: newVal };
-            saveData(); editOverlay.remove(); renderEditModal();
-          });
-        });
-      });
-    };
-    renderEditModal();
-  });
+  setTimeout(() => drawEvoChart(evoChart), 50);
 
   const allocCard = document.createElement("div"); allocCard.className = "card";
   allocCard.innerHTML = `<div class="card-title">Allocation investissements</div>`;
@@ -2065,15 +1910,14 @@ function dashboard(c) {
 
   const bRow = document.createElement("div"); bRow.className = "grid-3";
   const bStats = [
-    { label:"Budget essentiel / mois", value:eur(B.essentiel), sub:"50% — Besoins",                      color:"#e87830" },
-    { label:"Envies / mois",           value:eur(B.envies + B.resteAVivre), sub:"Projets + Reste à vivre", color:"#c868a8" },
-    { label:"Investissement / mois",   value:eur(B.invest),    sub:"20% — Épargne",                       color:"#34c77b" },
+    { label:"Budget essentiel / mois", value:eur(B.essentiel), sub:"50% — Besoins" },
+    { label:"Envies / mois",           value:eur(B.envies),    sub:"30% — Plaisirs" },
+    { label:"Investissement / mois",   value:eur(B.invest),    sub:"20% — Épargne" },
   ];
   bStats.forEach((s,i) => {
     const el = document.createElement("div");
-    el.className = "card";
-    el.style.cssText = `background:${s.color}15;border:1px solid ${s.color}45;--card-border:${s.color}45;--card-text:${s.color};border-radius:var(--radius);animation:fadeUp .35s ${(i*0.06+.2)}s ease both`;
-    el.innerHTML = `<div class="card-title" style="color:${s.color}">${s.label}</div>
+    el.className = "card"; el.style.animationDelay = (i*0.06+.2)+"s";
+    el.innerHTML = `<div class="card-title">${s.label}</div>
       <div class="stat-value" style="margin-top:2px">${s.value}</div>
       <div class="stat-sub">${s.sub}</div>`;
     bRow.appendChild(el);
@@ -2301,17 +2145,12 @@ function patrimoine(c) {
 
   // ── Immobilier ─────────────────────────────────────────────────────────────
 
-  { const { wrapper: w, container: ct } = sectionHeader("Immobilier", () => {
-    const biensVal = (D.immobilierBiens||[]).reduce((s, bien) => {
+  { const { wrapper: w, container: ct } = sectionHeader("Immobilier", () =>
+    (D.immobilierBiens||[]).reduce((s, bien) => {
       const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
-      return s + bienValNette(bien, loan);
-    }, 0);
-    const investImmoVal = (D.investImmo||[]).reduce((s, bien) => {
-      const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
-      return s + bienValNette(bien, loan);
-    }, 0);
-    return biensVal + investImmoVal;
-  });
+      const cap = loan ? loanKPIs(loan).capitalRestantADate : 0;
+      return s + (bien.valeurAchat - cap);
+    }, 0));
   ct.appendChild(buildImmoCard());
   leftCol.appendChild(w); }
 
@@ -2339,49 +2178,55 @@ function patrimoine(c) {
     footer.appendChild(footerLabel); footer.appendChild(footerTotal);
     card.appendChild(footer);
 
-    const GEAR_IMM = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
-
-    const addImmoRow = (bien, section, dotColor) => {
-      const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
-      const valNette = bienValNette(bien, loan);
-      const row = document.createElement("div"); row.className = "pat-account-row";
-      const colorDot = document.createElement("span");
-      colorDot.style.cssText = `width:9px;height:9px;border-radius:50%;background:${dotColor};flex-shrink:0;display:inline-block`;
-      const nameEl = document.createElement("span"); nameEl.className = "pat-acc-name";
-      nameEl.textContent = bien.name; nameEl.title = bien.name;
-      const bankObj = loan ? (D.banks||[]).find(b => b.name === loan.bank) : null;
-      const bankColor = bankObj ? bankObj.color : "#888";
-      const bankPill = document.createElement("span");
-      bankPill.style.cssText = `font-size:var(--text-md);color:${bankColor};border:1px solid ${bankColor}45;border-radius:20px;padding:1px 9px;font-family:var(--font-body);flex-shrink:0;width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${bankColor}15;text-align:center`;
-      bankPill.textContent = bankObj ? loan.bank : "—";
-      const valEl = document.createElement("span"); valEl.className = "pat-acc-eur"; valEl.textContent = eur(valNette);
-      const spacerAmt = document.createElement("span"); spacerAmt.className = "pat-acc-amt pat-acc-amt--spacer"; spacerAmt.textContent = "0,00";
-      const spacerCurr = document.createElement("span"); spacerCurr.style.cssText = "font-size:var(--text-md);color:transparent;border:1px solid transparent;border-radius:20px;padding:1px 7px;font-family:var(--font-body);flex-shrink:0"; spacerCurr.textContent = "EUR";
-      const editBtn = document.createElement("button"); editBtn.className = "edit-btn";
-      editBtn.innerHTML = GEAR_IMM;
-      editBtn.addEventListener("click", () => openBienModal(bien, section));
-      row.appendChild(colorDot); row.appendChild(nameEl); row.appendChild(bankPill); row.appendChild(spacerAmt); row.appendChild(spacerCurr); row.appendChild(valEl); row.appendChild(editBtn);
-      return row;
-    };
-
     function refresh() {
       rows.innerHTML = "";
-      const allBiens = [
-        ...(D.immobilierBiens||[]).map(b => ({ bien: b, section: 'immobilierBiens', dot: 'var(--chart3)' })),
-        ...(D.investImmo||[]).map(b => ({ bien: b, section: 'investImmo', dot: 'var(--chart4)' })),
-      ];
-      allBiens.forEach(({ bien, section, dot }) => rows.appendChild(addImmoRow(bien, section, dot)));
+      (D.immobilierBiens || []).forEach(bien => {
+        const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
+        const capitalRestant = loan ? loanKPIs(loan).capitalRestantADate : 0;
+        const valNette = bien.valeurAchat - capitalRestant;
 
-      if (allBiens.length === 0) {
+        const row = document.createElement("div"); row.className = "pat-account-row";
+
+        const colorDot = document.createElement("span");
+        colorDot.style.cssText = `width:9px;height:9px;border-radius:50%;background:var(--chart3);flex-shrink:0;display:inline-block`;
+
+        const nameEl = document.createElement("span"); nameEl.className = "pat-acc-name";
+        nameEl.textContent = bien.name; nameEl.title = bien.name;
+
+        const bankObj = loan ? (D.banks||[]).find(b => b.name === loan.bank) : null;
+        const bankColor = bankObj ? bankObj.color : "#888";
+        const bankPill = document.createElement("span");
+        bankPill.style.cssText = `font-size:var(--text-md);color:${bankColor};border:1px solid ${bankColor}45;border-radius:20px;padding:1px 9px;font-family:var(--font-body);flex-shrink:0;width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${bankColor}15;text-align:center`;
+        bankPill.textContent = bankObj ? loan.bank : "—";
+
+        const valEl = document.createElement("span");
+        valEl.textContent = eur(valNette);
+
+        // Bouton engrenage (même pattern que les autres cards)
+        const GEAR = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+        const editBtn = document.createElement("button"); editBtn.className = "edit-btn";
+        editBtn.innerHTML = GEAR;
+        editBtn.addEventListener("click", () => openBienModal(bien));
+
+        const spacerAmt = document.createElement("span"); spacerAmt.className = "pat-acc-amt pat-acc-amt--spacer"; spacerAmt.textContent = "0,00";
+        const spacerCurr = document.createElement("span"); spacerCurr.style.cssText = "font-size:var(--text-md);color:transparent;border:1px solid transparent;border-radius:20px;padding:1px 7px;font-family:var(--font-body);flex-shrink:0"; spacerCurr.textContent = "EUR";
+        valEl.className = "pat-acc-eur";
+
+        row.appendChild(colorDot); row.appendChild(nameEl); row.appendChild(bankPill); row.appendChild(spacerAmt); row.appendChild(spacerCurr); row.appendChild(valEl); row.appendChild(editBtn);
+        rows.appendChild(row);
+      });
+
+      if ((D.immobilierBiens||[]).length === 0) {
         const empty = document.createElement("div");
         empty.style.cssText = "padding:16px 20px;font-size:var(--text-md);color:var(--text3);text-align:center";
         empty.textContent = `Cliquez sur "+" pour ajouter`;
         rows.appendChild(empty);
       }
 
-      const total = allBiens.reduce((s, { bien, section }) => {
+      const total = (D.immobilierBiens||[]).reduce((s, bien) => {
         const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
-        return s + bienValNette(bien, loan);
+        const cap = loan ? loanKPIs(loan).capitalRestantADate : 0;
+        return s + (bien.valeurAchat - cap);
       }, 0);
       footerTotal.textContent = eur(total);
     }
@@ -2424,12 +2269,6 @@ function patrimoine(c) {
     const valInput = document.createElement("input"); valInput.className = "form-input"; valInput.type = "number"; valInput.step = "1000"; valInput.placeholder = "300 000"; valInput.id = "bm-valeur"; valInput.value = existing?.valeurAchat ?? existing?.amount ?? "";
     valGroup.appendChild(valLabel); valGroup.appendChild(valInput);
 
-    // Détention
-    const detGroup = document.createElement("div"); detGroup.className = "form-group";
-    const detLabel = document.createElement("label"); detLabel.textContent = "% de détention";
-    const detInput = document.createElement("input"); detInput.className = "form-input"; detInput.type = "number"; detInput.step = "1"; detInput.min = "1"; detInput.max = "100"; detInput.placeholder = "100"; detInput.id = "bm-detention"; detInput.value = existing?.detention ?? 100;
-    detGroup.appendChild(detLabel); detGroup.appendChild(detInput);
-
     // Boutons
     const actions = document.createElement("div");
     actions.style.cssText = `display:grid;grid-template-columns:${isEdit ? "1fr 1fr 1fr" : "1fr 1fr"};gap:8px`;
@@ -2441,7 +2280,7 @@ function patrimoine(c) {
     const saveBtn = document.createElement("button"); saveBtn.className = "app-btn app-btn--rect app-btn--primary"; saveBtn.id = "bm-save"; saveBtn.textContent = isEdit ? "Enregistrer" : "Ajouter";
     actions.appendChild(cancelBtn); actions.appendChild(saveBtn);
 
-    body.appendChild(nomGroup); body.appendChild(valGroup); body.appendChild(detGroup); body.appendChild(actions);
+    body.appendChild(nomGroup); body.appendChild(valGroup); body.appendChild(actions);
     modal.appendChild(body);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
@@ -2471,10 +2310,9 @@ function patrimoine(c) {
       const valeur = parseFloat(valInput.value) || 0;
       if (!name || valeur <= 0) { toast("Nom et valeur estimée obligatoires"); return; }
       if (isEdit) {
-        existing.name = name; existing.valeurAchat = valeur; existing.amount = valeur; existing.detention = parseFloat(detInput.value) || 100;
+        existing.name = name; existing.valeurAchat = valeur; existing.amount = valeur;
       } else {
-        const detention = parseFloat(detInput.value) || 100;
-        const entry = { id: Date.now(), name, valeurAchat: valeur, amount: valeur, currency: 'EUR', detention };
+        const entry = { id: Date.now(), name, valeurAchat: valeur, amount: valeur, currency: 'EUR' };
         if (!Array.isArray(D[section])) D[section] = [];
         D[section].push(entry);
       }
@@ -2485,16 +2323,16 @@ function patrimoine(c) {
 
   // ── Investissements (tableaux éditables) ────────────────────────────────────
 
-  const { wrapper: invWrap, container: invContainer } = sectionHeader("Bourse", () => {
+  const { wrapper: invWrap, container: invContainer } = sectionHeader("Investissements", () => {
     const P2 = computePatrimoine();
-    return P2.etfMkt + P2.stkMkt + P2.cryMkt;
-  });
+    const investImmoVal = (D.investImmo||[]).reduce((s, bien) => {
+      const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
+      return s + (loan ? loanKPIs(loan).valeurNette : (bien.valeurAchat ?? bien.amount ?? 0));
+    }, 0);
+    const alternatifVal = (D.investAlternatif||[]).reduce((s,a) => s + fxToEur(a.amount||0, a.currency||"EUR"), 0);
+    return P2.etfMkt + P2.stkMkt + P2.cryMkt + investImmoVal + alternatifVal;
+  }, "16px");
   leftCol.appendChild(invWrap);
-
-  { const { wrapper: w, container: ct } = sectionHeader("Autres", () =>
-    (D.investAlternatif||[]).reduce((s,a) => s + fxToEur(a.amount||0, a.currency||"EUR"), 0));
-  ct.appendChild(buildAccountTable("investAlternatif", "Autres"));
-  leftCol.appendChild(w); }
 
   // Card comptes d'investissement partagée — même données pour Liquidités / ETF / Actions / Crypto
   function buildInvestAccountTable(title = "Comptes d'investissement", accountSection = "liquiditesInvest", posArrays = null, readonly = false) {
@@ -2645,11 +2483,89 @@ function patrimoine(c) {
   }
 
   // ── Card Invest. immo. (SCPI · Locatif) — même modale que Immobilier ────────
+  function buildInvestImmoCard() {
+    const card = document.createElement("div"); card.className = "card";
+    const GEAR = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+
+    const header = document.createElement("div"); header.className = "card-title";
+    header.style.cssText = "margin:-20px -20px 0;border-bottom:1px solid var(--border)";
+    const titleSpan = document.createElement("span"); titleSpan.textContent = "Invest. immo. (SCPI · Locatif)";
+    const addBtn = document.createElement("button"); addBtn.className = "app-btn app-btn--round";
+    addBtn.title = "Ajouter un bien"; addBtn.textContent = "+";
+    
+    addBtn.addEventListener("click", () => openBienModal(null, 'investImmo'));
+    header.appendChild(titleSpan); header.appendChild(addBtn);
+    card.appendChild(header);
+
+    const rows = document.createElement("div"); rows.style.cssText = "margin:0 -20px";
+    card.appendChild(rows);
+
+    const footer = document.createElement("div"); footer.className = "card-title";
+    footer.style.cssText = "margin:0 -20px -20px;border-top:1px solid var(--border);border-bottom:none;padding:10px 20px";
+    const footerLabel = document.createElement("span"); footerLabel.textContent = "Total";
+    const footerTotal = document.createElement("span");
+    footerTotal.style.cssText = "font-family:var(--font-mono);color:var(--amber)";
+    footer.appendChild(footerLabel); footer.appendChild(footerTotal);
+    card.appendChild(footer);
+
+    const refresh = () => {
+      rows.innerHTML = "";
+      (D.investImmo || []).forEach(bien => {
+        const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
+        // Valeur affichée : valeur nette si crédit associé, sinon valeurAchat/amount
+        const valAffichee = loan
+          ? loanKPIs(loan).valeurNette
+          : (bien.valeurAchat ?? bien.amount ?? 0);
+
+        const row = document.createElement("div"); row.className = "pat-account-row";
+        const colorDot = document.createElement("span");
+        colorDot.style.cssText = `width:9px;height:9px;border-radius:50%;background:var(--chart4);flex-shrink:0;display:inline-block`;
+        const nameEl = document.createElement("span"); nameEl.className = "pat-acc-name";
+        nameEl.textContent = bien.name; nameEl.title = bien.name;
+        const bankObj2 = loan ? (D.banks||[]).find(b => b.name === loan.bank) : null;
+        const bankColor2 = bankObj2 ? bankObj2.color : "#888";
+        const bankPill2 = document.createElement("span");
+        bankPill2.style.cssText = `font-size:var(--text-md);color:${bankColor2};border:1px solid ${bankColor2}45;border-radius:20px;padding:1px 9px;font-family:var(--font-body);flex-shrink:0;width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${bankColor2}15;text-align:center`;
+        bankPill2.textContent = bankObj2 ? loan.bank : "—";
+        const valEl = document.createElement("span");
+        valEl.className = "pat-acc-eur";
+        valEl.textContent = eur(valAffichee);
+        const spacerAmt2 = document.createElement("span"); spacerAmt2.className = "pat-acc-amt pat-acc-amt--spacer"; spacerAmt2.textContent = "0,00";
+        const spacerCurr2 = document.createElement("span"); spacerCurr2.style.cssText = "font-size:var(--text-md);color:transparent;border:1px solid transparent;border-radius:20px;padding:1px 7px;font-family:var(--font-body);flex-shrink:0"; spacerCurr2.textContent = "EUR";
+        const editBtn = document.createElement("button"); editBtn.className = "edit-btn";
+        editBtn.innerHTML = GEAR;
+        editBtn.addEventListener("click", () => openBienModal(bien, 'investImmo'));
+        row.appendChild(colorDot); row.appendChild(nameEl); row.appendChild(bankPill2); row.appendChild(spacerAmt2); row.appendChild(spacerCurr2); row.appendChild(valEl); row.appendChild(editBtn);
+        rows.appendChild(row);
+      });
+
+      if ((D.investImmo||[]).length === 0) {
+        const empty = document.createElement("div");
+        empty.style.cssText = "padding:16px 20px;font-size:var(--text-md);color:var(--text3);text-align:center";
+        empty.textContent = `Cliquez sur "+" pour ajouter`;
+        rows.appendChild(empty);
+      }
+
+      const total = (D.investImmo||[]).reduce((s, bien) => {
+        const loan = (D.loans||[]).find(l => l.immobilierBienId === bien.id);
+        const val = loan ? loanKPIs(loan).valeurNette : (bien.valeurAchat ?? bien.amount ?? 0);
+        return s + val;
+      }, 0);
+      footerTotal.textContent = eur(total);
+    };
+
+    refresh();
+    document.addEventListener("datachanged", () => { if (card.isConnected) refresh(); });
+    return card;
+  }
 
   const P0 = computePatrimoine();
-  invContainer.appendChild(buildInvestAccountTable("Bourse", "liquiditesInvest", () => [...(D.etfPositions||[]), ...(D.stockPositions||[])], true));
+  invContainer.appendChild(buildInvestAccountTable("Bourse (ETF · Actions)", "liquiditesInvest", () => [...(D.etfPositions||[]), ...(D.stockPositions||[])], true));
   invContainer.appendChild(buildInvestAccountTable("Crypto",  "cryptoAccounts",   () => D.cryptoPositions||[], false));
-  leftCol.style.paddingBottom = "40px";
+  invContainer.appendChild(buildInvestImmoCard());
+  invContainer.appendChild(buildAccountTable("investAlternatif", "Alternatif (Art · PE · Crowdf.)"));
+  leftCol.style.paddingBottom = "16px";
+  leftCol.appendChild(invContainer);
 
 }
 
@@ -2914,7 +2830,7 @@ function budget(c) {
 
     document.getElementById("bedit-delete").addEventListener("click", () => {
       close();
-      confirmModal("Êtes-vous sûr de vouloir supprimer ?", "Cette action est irréversible.", () => {
+      confirmModal(`Supprimer "<strong>${item.label}</strong>" ?`, "Cette action est irréversible.", () => {
         D[dataKey].splice(i, 1);
         saveData(); refreshCard(); refreshAnalysis();
         toast("Dépense supprimée");
@@ -3382,7 +3298,47 @@ function budget(c) {
   refreshAnalysis();
 
   // Badge "Reste à vivre négatif" — modale détail
-  document.getElementById("budget-analysis-warn")?.addEventListener("click", () => openResteNegatifModal());
+  document.getElementById("budget-analysis-warn")?.addEventListener("click", () => {
+    const B = computeBudget();
+    const resteVal = B.salaire - B.essentiel - B.invest - B.envies;
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:#00000088;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px";
+    overlay.innerHTML = `
+      <div style="background:var(--surface);border:1px solid #e0505055;border-radius:var(--radius);padding:0;width:100%;max-width:360px;animation:fadeUp .2s ease">
+        <div class="card-title" style="color:var(--loss)">⚠ Reste à vivre négatif</div>
+        <div style="padding:6px 20px 20px">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Salaire net</span>
+            <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">${eur(B.salaire)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Dépenses essentielles</span>
+            <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">− ${eur(B.essentiel)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Investissements</span>
+            <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">− ${eur(B.invest)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text)">Envies / Projets</span>
+            <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text)">− ${eur(B.envies)}</span>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between">
+            <span style="font-family:var(--font-body);font-size:var(--text-md);color:var(--loss)">Reste à vivre</span>
+            <span style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--loss)">${eur(resteVal)}</span>
+          </div>
+        </div>
+        <p style="font-family:var(--font-body);font-size:var(--text-md);color:var(--text);line-height:1.6;margin-bottom:16px">Vos dépenses dépassent votre salaire net. Réduisez vos dépenses essentielles, vos envies ou votre montant d'investissement.</p>
+        <div style="text-align:right">
+          <button class="app-btn app-btn--rect" id="budget-warn-close">Fermer</button>
+        </div>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener("pointerdown", e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector("#budget-warn-close").addEventListener("click", () => overlay.remove());
+  });
 
   document.getElementById("budget-reste-warn")?.addEventListener("click", () => {
     document.getElementById("budget-analysis-warn").click();
@@ -3688,10 +3644,6 @@ function livretOpenMvtModal(c) {
           </div>
         </div>`).join("")}
     </div>
-    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:14px">
-      <input type="checkbox" id="mvt-update-livret" style="accent-color:var(--amber);width:15px;height:15px;flex-shrink:0">
-      <span style="font-size:var(--text-md);color:var(--text)">Mettre à jour les comptes dans Patrimoine</span>
-    </label>
     <div class="form-actions">
       <button class="app-btn app-btn--rect" id="mvt-cancel">Annuler</button>
       <button class="app-btn app-btn--rect app-btn--primary" id="mvt-save">Enregistrer</button>
@@ -3721,20 +3673,6 @@ function livretOpenMvtModal(c) {
 
     D.livretMouvements.push(mvt);
     D.livretMouvements.sort((a, b) => a.date.localeCompare(b.date));
-
-    // Mettre à jour les livrets associés si case cochée
-    if (modal.querySelector("#mvt-update-livret")?.checked) {
-      D.livretEnveloppes.forEach(env => {
-        const val = parseFloat(modal.querySelector("#mvt-" + env.id)?.value) || 0;
-        if (val === 0) return;
-        const livretName = (D.livretAssociations || {})[env.id];
-        if (!livretName) return;
-        const liv = (D.livrets || []).find(l => l.name === livretName);
-        if (liv) liv.amount = Math.round(((liv.amount || 0) + val) * 100) / 100;
-      });
-      document.dispatchEvent(new Event("datachanged"));
-    }
-
     saveData();
     close();
     livret(c);
@@ -3849,7 +3787,7 @@ function virements(c) {
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   const getAccountColor = name => {
-    const all = [...(D.compteCourants||[]),...(D.livrets||[]),...(D.liquiditesInvest||[]),...(D.plansEpargne||[]),...(D.cryptoAccounts||[])];
+    const all = [...(D.compteCourants||[]),...(D.livrets||[]),...(D.liquiditesInvest||[]),...(D.plansEpargne||[])];
     const acc = all.find(a => a.name === name);
     if (acc?.color) return acc.color;
     const bank = (D.banks||[]).find(b => b.name === acc?.bank);
@@ -3857,7 +3795,7 @@ function virements(c) {
   };
 
   const getAccountBank = name => {
-    const all = [...(D.compteCourants||[]),...(D.livrets||[]),...(D.liquiditesInvest||[]),...(D.plansEpargne||[]),...(D.cryptoAccounts||[])];
+    const all = [...(D.compteCourants||[]),...(D.livrets||[]),...(D.liquiditesInvest||[]),...(D.plansEpargne||[])];
     return all.find(a => a.name === name)?.bank || "—";
   };
 
@@ -3875,9 +3813,9 @@ function virements(c) {
   const allLivrets = (D.livrets||[]);
 
   // Récupérer l'état arrondi depuis D.virements.arrondis (objet {nomCompte: bool})
+  if (!D.virements.arrondis) D.virements.arrondis = {};
 
-  const revenusCompl = (V.revenusComplementaires || []).filter(r => r.amount > 0);
-  const salaire = revenusCompl.reduce((s,r) => s + (r.amount||0), 0);
+  const salaire = V.salaireMensuel || 0;
 
   // CC1 = premier compte courant (reçoit le salaire, pas un "virement")
   const cc1Name = allCC[0]?.name || null;
@@ -3942,19 +3880,6 @@ function virements(c) {
     });
   }
 
-  // ── Comptes d'investissement pour la card Virements investissements ────────
-  const allInvAccounts = [
-    ...(D.liquiditesInvest||[]).map(a => ({ name: a.name, bank: a.bank || '—', color: getAccountColor(a.name) })),
-    ...(D.cryptoAccounts||[]).map(a => ({ name: a.name, bank: a.bank || '—', color: getAccountColor(a.name) })),
-  ];
-
-
-  // Répartir budgetInv entre les comptes (proportionnellement si pas encore configuré)
-  const nInv = allInvAccounts.length;
-  const rowsInv = allInvAccounts.map((acc) => {
-    return { name: acc.name, bank: acc.bank, color: acc.color, raw: 0, montant: 0, arrondi: false, isCC1: false };
-  });
-
   // Totaux hors CC1 (CC1 = reste)
   const totalCC  = rowsCC.filter(r => !r.isCC1).reduce((s,r) => s + r.montant, 0);
   const totalLiv = rowsLiv.reduce((s,r) => s + r.montant, 0);
@@ -3979,86 +3904,40 @@ function virements(c) {
   const salHead = document.createElement("div");
   salHead.className = "card-title";
   salHead.style.cssText = "margin:0;border-bottom:1px solid var(--border)";
-  salHead.innerHTML = '<span>Revenus</span>';
-  const salAddBtn = document.createElement('button');
-  salAddBtn.className = 'app-btn app-btn--round';
-  salAddBtn.title = 'Ajouter un revenu';
-  salAddBtn.textContent = '+';
-  salAddBtn.addEventListener('click', () => openRevComplModal(null));
-  salHead.appendChild(salAddBtn);
-  salCard.appendChild(salHead);
+  salHead.textContent = "Salaire net du mois";
+  const salBody = document.createElement("div");
+  salBody.style.cssText = "padding:12px 16px;display:flex;justify-content:center";
+  salBody.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden">
+        <input class="vir-salaire-input" id="vir-salaire" type="number" step="50" value="${salaire}" placeholder="2500">
+        <div style="display:flex;flex-direction:column;border-left:1px solid var(--border2)">
+          <button id="vir-sal-up" class="dca-stepper-btn" title="+50">▲</button>
+          <button id="vir-sal-down" class="dca-stepper-btn" title="-50">▼</button>
+        </div>
+      </div>
+      <span style="color:var(--text)">€ / mois</span>
+    </div>`;
+  salCard.appendChild(salHead); salCard.appendChild(salBody);
   c.appendChild(salCard);
 
-  // ── Revenus complémentaires ──────────────────────────────────────────────
-  const buildRevCompl = () => {
-    const existing = salCard.querySelector('#rev-compl-section');
-    if (existing) existing.remove();
-    const section = document.createElement('div');
-    section.id = 'rev-compl-section';
-    section.style.cssText = 'padding-top:4px';
-
-    const revs = V.revenusComplementaires || [];
-    revs.forEach((rev, idx) => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 10px';
-      row.innerHTML = `
-        <span style="flex:1;font-size:var(--text-md);color:var(--text)">${rev.name}</span>
-        <span style="font-family:var(--font-mono);color:var(--text);font-size:var(--text-md)">${eur(rev.amount)}</span>
-        <button class="edit-btn" data-idx="${idx}" title="Modifier"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>`;
-      row.querySelector('button').addEventListener('click', () => openRevComplModal(idx));
-      section.appendChild(row);
-    });
-
-
-
-    salCard.appendChild(section);
+  const salInput = document.getElementById("vir-salaire");
+  const updateSalaire = val => {
+    if (isNaN(val) || val < 0) return;
+    D.virements.salaireMensuel = val;
+    salInput.value = val;
+    saveData();
+    recalcAll();
   };
-
-  const openRevComplModal = (idx) => {
-    const isEdit = idx !== null;
-    const rev = isEdit ? (V.revenusComplementaires[idx] || {}) : {};
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px';
-    overlay.innerHTML = `
-      <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:0;width:100%;max-width:360px;animation:fadeUp .2s ease">
-        <div class="card-title">${isEdit ? 'Modifier le revenu' : 'Ajouter un revenu'}</div>
-        <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:12px">
-          <div class="form-group">
-            <label>Nom</label>
-            <input class="form-input" id="rc-name" type="text" placeholder="Ex : Loyer perçu" value="${rev.name||''}">
-          </div>
-          <div class="form-group">
-            <label>Montant (€ / mois)</label>
-            <input class="form-input" id="rc-amount" type="number" step="50" placeholder="500" value="${rev.amount||''}">
-          </div>
-          <div style="display:grid;grid-template-columns:${isEdit?'1fr 1fr 1fr':'1fr 1fr'};gap:8px">
-            ${isEdit ? '<button class="app-btn app-btn--rect" id="rc-del" style="color:var(--loss);background:var(--loss)12;border-color:var(--loss)45">Supprimer</button>' : ''}
-            <button class="app-btn app-btn--rect" id="rc-cancel">Annuler</button>
-            <button class="app-btn app-btn--rect app-btn--primary" id="rc-save">Enregistrer</button>
-          </div>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-    overlay.querySelector('#rc-cancel').addEventListener('click', () => overlay.remove());
-    if (isEdit) overlay.querySelector('#rc-del').addEventListener('click', () => {
-      confirmModal('Supprimer ce revenu ?', '', () => {
-        V.revenusComplementaires.splice(idx, 1);
-        saveData(); overlay.remove(); buildRevCompl(); recalcAll();
-      });
-    });
-    overlay.querySelector('#rc-save').addEventListener('click', () => {
-      const name   = overlay.querySelector('#rc-name').value.trim();
-      const amount = parseFloat(overlay.querySelector('#rc-amount').value) || 0;
-      if (!name || amount <= 0) { toast('Nom et montant obligatoires'); return; }
-      if (!V.revenusComplementaires) V.revenusComplementaires = [];
-      if (isEdit) { V.revenusComplementaires[idx] = { name, amount }; }
-      else        { V.revenusComplementaires.push({ name, amount }); }
-      saveData(); overlay.remove(); buildRevCompl(); recalcAll();
-    });
-  };
-
-  buildRevCompl();
+  salInput.addEventListener("input", e => updateSalaire(parseFloat(e.target.value) || 0));
+  document.getElementById("vir-sal-up")?.addEventListener("click", () => updateSalaire((parseFloat(salInput.value)||0) + 50));
+  document.getElementById("vir-sal-down")?.addEventListener("click", () => updateSalaire(Math.max(0, (parseFloat(salInput.value)||0) - 50)));
+  ["vir-sal-up","vir-sal-down"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener("mouseenter", () => btn.style.color = "var(--amber)");
+    btn.addEventListener("mouseleave", () => btn.style.color = "var(--text3)");
+  });
 
   // ══════════════════════════════════════════════════════════════════════════
   // CARD 2 — Diagramme Sankey SVG
@@ -4068,25 +3947,7 @@ function virements(c) {
 
   const sankeyCard = document.createElement("div"); sankeyCard.className = "card";
   sankeyCard.style.cssText = "padding:20px 20px 20px;overflow:visible";
-  sankeyCard.innerHTML = `<div class="card-title" style="margin-bottom:16px">
-    <span>Flux du salaire</span>
-    <span id="sankey-warn-badge" style="display:none;align-items:center;gap:6px;flex-shrink:0;cursor:pointer">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;color:var(--loss)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span style="display:inline-flex;align-items:center;background:var(--loss)18;border:1px solid #e0505044;border-radius:6px;padding:0 8px;height:var(--input-h);font-family:var(--font-mono);font-size:var(--text-md);color:var(--loss);cursor:pointer;box-sizing:border-box">Reste à vivre négatif</span>
-    </span>
-  </div>`;
-  sankeyCard.querySelector('#sankey-warn-badge').addEventListener('click', () => openResteNegatifModal());
-
-  const updateSankeyAlert = () => {
-    const B = computeBudget();
-    const badgeEl = sankeyCard.querySelector('#sankey-warn-badge');
-    if (!badgeEl) return;
-    if (B.resteAVivre < 0) {
-      badgeEl.style.display = "inline-flex";
-    } else {
-      badgeEl.style.display = "none";
-    }
-  };
+  sankeyCard.innerHTML = `<div class="card-title" style="margin-bottom:16px">Flux du salaire</div>`;
 
   const sankeyWrap = document.createElement("div");
   sankeyWrap.style.cssText = "width:100%;overflow:visible";
@@ -4097,171 +3958,133 @@ function virements(c) {
     const containerW = sankeyCard.clientWidth - 40;
     if (containerW <= 0) return;
 
-    // ── Sources ─────────────────────────────────────────────────────────────
-    const sources = (D.virements.revenusComplementaires || [])
-      .filter(r => r.amount > 0)
-      .map(r => ({ name: r.name, amount: r.amount, color: r.isSalaire ? '#f0a020' : 'var(--gain)' }));
-    const hasMultiSrc = sources.length > 1;
+    // ── Layout constants ────────────────────────────────────────────────────
+    const LABEL_L   = 100;  // left labels width
+    const NODE_W    = 16;   // nœud width
+    const GAP_MID   = 180;  // espace entre les deux colonnes de nœuds
+    const LABEL_R   = 160;  // right labels width
+    const TOTAL_W   = LABEL_L + NODE_W + GAP_MID + NODE_W + LABEL_R;
 
-    // ── Destinations ─────────────────────────────────────────────────────────
+    const GAP_NODE  = 8;    // gap entre nœuds droits
+    const ROW_H     = 44;   // hauteur min par ligne droite
+    const MIN_BAND  = 8;    // épaisseur min d'un flux
+
+    const srcVal = (D.virements.salaireMensuel || 0) || 1;
+
+    // Destinations — recalcul depuis l'état courant, zéros exclus du graphique
     const dests = [];
     rowsCC.forEach((r, i) => {
       const val = curCC[i];
       if (val <= 0) return;
-      dests.push({ name: r.isCC1 ? `Reste sur ${r.name}` : r.name, val, color: r.color });
+      const label = r.isCC1 ? `Reste sur ${r.name}` : r.name;
+      dests.push({ name: label, sub: r.bank, val, color: r.color });
     });
     rowsLiv.forEach((r, i) => {
       const val = curLiv[i];
       if (val <= 0) return;
-      dests.push({ name: r.name, val, color: r.color });
+      dests.push({ name: r.name, sub: r.bank, val, color: r.color });
     });
-    if (s2ok) {
-      rowsInv.forEach((r, i) => {
-        const val = curInv[i];
-        if (val <= 0) return;
-        dests.push({ name: r.name, val, color: r.color });
-      });
-      const totalAutoInvSankey = curInv.reduce((s,v) => s+v, 0);
-      const resteInvSankey = Math.round((budgetInv - totalAutoInvSankey) * 100) / 100;
-      if (resteInvSankey > 0) {
-        dests.push({ name: 'Reste à investir', val: resteInvSankey, color: 'var(--text3)' });
-      }
-    }
+    const totalSortFresh = dests.reduce((s,d) => s + d.val, 0);
+    // Pas de "Dépassement" : CC1 absorbe toujours le reste (peut devenir négatif)
+
     if (dests.length === 0) { sankeyWrap.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text3)">Aucune dépense assignée à des comptes</div>`; return; }
 
-    const srcVal = (D.virements.revenusComplementaires || []).reduce((s,r) => s+(r.amount||0), 0) || 1;
-    const colText = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    // ── Hauteurs ────────────────────────────────────────────────────────────
+    const svgH = Math.max(dests.length * ROW_H + GAP_NODE * (dests.length - 1), 200);
 
-    // ── Layout ───────────────────────────────────────────────────────────────
-    const LABEL_L  = hasMultiSrc ? 120 : 110;
-    const NODE_W   = 16;
-    const GAP_L    = hasMultiSrc ? 160 : 0;  // gap: sources → nœud central
-    const GAP_R    = hasMultiSrc ? 160 : 200;  // gap: nœud central → destinations
-    const LABEL_R  = 180;
-    const GAP_NODE = 8;
-    const ROW_H    = 44;
-    const MIN_BAND = 8;
+    // Nœud source : même hauteur que la somme des nœuds destination (sans les gaps)
+    const availH    = svgH - GAP_NODE * (dests.length - 1);
+    const SRC_H  = availH;
+    const SRC_X  = LABEL_L;
+    const SRC_Y  = (svgH - SRC_H) / 2;  // centré verticalement
 
-    // nœud central X
-    const CTR_X = LABEL_L + (hasMultiSrc ? NODE_W + GAP_L : 0);
-    const DST_X = CTR_X + NODE_W + GAP_R;
-    const TOTAL_W = DST_X + NODE_W + LABEL_R;
+    // Nœuds destinations : proportionnels au montant
+    const totalDest = dests.reduce((s,d) => s + d.val, 0) || 1;
 
-    // ── Heights ──────────────────────────────────────────────────────────────
-    // svgH = total height including gaps between destination nodes
-    const svgH   = Math.max(dests.length * ROW_H + GAP_NODE * (dests.length - 1), 200);
-    // availH = sum of node heights only (no gaps) — this is CTR_H
-    const availH = svgH - GAP_NODE * (dests.length - 1);
-    // Center node = sum of bands without gaps, centered in svgH
-    const CTR_H  = availH;
-    const CTR_Y  = (svgH - CTR_H) / 2;
-
-    // Destination nodes — proportional to srcVal, normalized to availH, starting at y=0
-    const dNodes = dests.map(d => ({ ...d, h: Math.max(MIN_BAND, (d.val / srcVal) * availH) }));
+    let curY = 0;
+    const dNodes = dests.map(d => {
+      const h = Math.max(MIN_BAND, (d.val / srcVal) * svgH);
+      return { ...d, h };
+    });
+    // Normalize so heights sum to availH
     const rawSum = dNodes.reduce((s,d) => s+d.h, 0);
     const scale  = availH / rawSum;
-    let curY = 0;
-    dNodes.forEach(d => { d.h = Math.max(MIN_BAND, d.h * scale); d.y = curY; curY += d.h + GAP_NODE; });
-    // Total height of right column with gaps = svgH, starting at y=0 ✓
+    dNodes.forEach(d => {
+      d.h = Math.max(MIN_BAND, d.h * scale);
+      d.y = curY;
+      curY += d.h + GAP_NODE;
+    });
 
-    // ── Paths: center → destinations ─────────────────────────────────────────
-    let ctrOffset = 0;
-    dNodes.forEach(d => { d.ctrY = CTR_Y + ctrOffset; ctrOffset += d.h; });
-    const cx1r = CTR_X + NODE_W + GAP_R * 0.45;
-    const cx2r = CTR_X + NODE_W + GAP_R * 0.55;
-    const pathsR = dNodes.map(d => {
-      const x1 = CTR_X + NODE_W, x2 = DST_X;
-      return `<path d="M${x1} ${d.ctrY} C${cx1r} ${d.ctrY} ${cx2r} ${d.y} ${x2} ${d.y}
-                       L${x2} ${d.y+d.h} C${cx2r} ${d.y+d.h} ${cx1r} ${d.ctrY+d.h} ${x1} ${d.ctrY+d.h} Z"
+    // ── Positions ───────────────────────────────────────────────────────────
+    const DST_X = LABEL_L + NODE_W + GAP_MID;
+
+    // Source offsets : chaque flux part de sa tranche proportionnelle sur le nœud source
+    let srcOffset = 0;
+    dNodes.forEach(d => {
+      d.srcY = SRC_Y + srcOffset;
+      srcOffset += d.h;  // pas de gap sur le nœud source, les bandes se touchent
+    });
+
+    // ── SVG pieces ──────────────────────────────────────────────────────────
+    const cx1 = LABEL_L + NODE_W + GAP_MID * 0.45;
+    const cx2 = LABEL_L + NODE_W + GAP_MID * 0.55;
+
+    const paths = dNodes.map(d => {
+      const y1t = d.srcY;          // source top
+      const y1b = d.srcY + d.h;   // source bottom
+      const y2t = d.y;             // dest top
+      const y2b = d.y + d.h;      // dest bottom
+      const x1  = SRC_X + NODE_W;
+      const x2  = DST_X;
+      return `<path d="M${x1} ${y1t} C${cx1} ${y1t} ${cx2} ${y2t} ${x2} ${y2t}
+                       L${x2} ${y2b} C${cx2} ${y2b} ${cx1} ${y1b} ${x1} ${y1b} Z"
         fill="${d.color}" fill-opacity="0.45"/>`;
     });
 
-    // ── Paths: sources → center (only if multiple sources) ───────────────────
-    let pathsL = [];
-    let srcRects = '';
-    let srcLabels = '';
+    const srcRect  = `<rect x="${SRC_X}" y="${SRC_Y}" width="${NODE_W}" height="${SRC_H}" rx="4" fill="#f0a020"/>`;
+    const dstRects = dNodes.map(d =>
+      `<rect x="${DST_X}" y="${d.y}" width="${NODE_W}" height="${d.h}" rx="3" fill="${d.color}"/>`
+    ).join("");
 
-    // ── Center node: always solid amber ──────────────────────────────────────
-    const ctrRects = `<rect x="${CTR_X}" y="${CTR_Y}" width="${NODE_W}" height="${CTR_H}" rx="4" fill="#f0a020"/>`;
+    // Left label — centré sur le nœud source
+    const srcLabelX = SRC_X - 10;
+    const srcLabelY = SRC_Y + SRC_H / 2;
+    const colText   = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+    const colText2  = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim();
+    const srcLabel  = `
+      <text x="${srcLabelX}" y="${srcLabelY - 8}" dominant-baseline="middle" text-anchor="end" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="600" fill="${colText}">Salaire</text>
+      <text x="${srcLabelX}" y="${srcLabelY + 8}" dominant-baseline="middle" text-anchor="end" font-family="DM Mono,monospace" font-size="11" fill="#f0a020">${eur(D.virements.salaireMensuel || 0)}</text>`;
 
-    if (hasMultiSrc) {
-      // Source nodes: each has same height as its proportional share of RIGHT column (with gaps)
-      // i.e. height proportional to dNodes total height (with gaps), placed with gaps between them
-      const SRC_X = LABEL_L;
-      const cx1l = SRC_X + NODE_W + GAP_L * 0.45;
-      const cx2l = SRC_X + NODE_W + GAP_L * 0.55;
-
-      // Source nodes: each h = proportional slice of CTR_H (matches center node exactly)
-      // Gap between sources = (svgH - CTR_H) / (sources.length - 1)
-      // This ensures: sum(h_i) + gaps = CTR_H + (svgH-CTR_H) = svgH ✓
-      const srcGap = sources.length > 1 ? (svgH - CTR_H) / (sources.length - 1) : 0;
-      const srcNodes = sources.map(src => ({
-        ...src,
-        h: (src.amount / srcVal) * CTR_H
-      }));
-      let srcY = 0;
-      srcNodes.forEach(n => {
-        n.y = srcY;
-        srcY += n.h + srcGap;
-      });
-      // Total: sum(h_i)=CTR_H, gaps=(n-1)*srcGap=svgH-CTR_H → total=svgH ✓
-
-      // Center offsets: proportional slices of CTR_H, starting at CTR_Y
-      // Source node midpoint vertically = proportional midpoint on center node
-      // Each source band on center = (amount/srcVal)*CTR_H, starting from CTR_Y
-      let ctrOffsetL = CTR_Y;
-      srcNodes.forEach((src) => {
-        const ctrH = (src.amount / srcVal) * CTR_H;
-        // Bezier: from src node (src.y → src.y+src.h) to center slice (ctrOffsetL → ctrOffsetL+ctrH)
-        pathsL.push(`<path d="M${SRC_X+NODE_W} ${src.y} C${cx1l} ${src.y} ${cx2l} ${ctrOffsetL} ${CTR_X} ${ctrOffsetL}
-                              L${CTR_X} ${ctrOffsetL+ctrH} C${cx2l} ${ctrOffsetL+ctrH} ${cx1l} ${src.y+src.h} ${SRC_X+NODE_W} ${src.y+src.h} Z"
-          fill="${src.color}" fill-opacity="0.35"/>`);
-        // source rect — vertically centered relative to its center-slice midpoint
-        srcRects += `<rect x="${SRC_X}" y="${src.y.toFixed(1)}" width="${NODE_W}" height="${src.h.toFixed(1)}" rx="3" fill="${src.color}"/>`;
-        // source label — centered on src node
-        const midY = src.y + src.h/2;
-        srcLabels += `
-          <text x="${SRC_X-8}" y="${midY-7}" dominant-baseline="middle" text-anchor="end" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="600" fill="${colText}">${src.name}</text>
-          <text x="${SRC_X-8}" y="${midY+7}" dominant-baseline="middle" text-anchor="end" font-family="DM Mono,monospace" font-size="11" fill="${src.color}">${eur(src.amount)}</text>`;
-        ctrOffsetL += ctrH;
-      });
-
-      // Verify alignment: ctrOffsetL should equal CTR_Y + CTR_H ✓
-    } else {
-      // Single source: label left of center node
-      const midY = CTR_Y + CTR_H/2;
-      srcLabels = `
-        <text x="${CTR_X-8}" y="${midY-7}" dominant-baseline="middle" text-anchor="end" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="600" fill="${colText}">${sources[0].name}</text>
-        <text x="${CTR_X-8}" y="${midY+7}" dominant-baseline="middle" text-anchor="end" font-family="DM Mono,monospace" font-size="11" fill="#f0a020">${eur(sources[0].amount)}</text>`;
-    }
-
-    // ── Destination nodes + labels ────────────────────────────────────────────
-    const dstRects  = dNodes.map(d => `<rect x="${DST_X}" y="${d.y}" width="${NODE_W}" height="${d.h}" rx="3" fill="${d.color}"/>`).join('');
+    // Right labels — centrés verticalement sur la barre
     const dstLabels = dNodes.map(d => {
-      const midY = d.y + d.h/2;
+      const midY = d.y + d.h / 2;
       const pct  = (d.val / srcVal * 100).toFixed(1);
       const lx   = DST_X + NODE_W + 10;
-      if (d.h < 22) return `<text x="${lx}" y="${midY}" dominant-baseline="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="600" fill="${colText}">${d.name}  <tspan font-family="DM Mono,monospace" font-size="10" fill="${d.color}">${eur(d.val)}</tspan></text>`;
+      if (d.h < 22) {
+        // Barre trop petite : une seule ligne centrée
+        return `<text x="${lx}" y="${midY}" dominant-baseline="middle" font-family="Instrument Sans,sans-serif" font-size="11" font-weight="600" fill="${colText}">${d.name}  <tspan font-family="DM Mono,monospace" font-size="10" fill="${d.color}">${eur(d.val)}</tspan></text>`;
+      }
+      // Deux lignes centrées : bloc total ~15px, centré sur midY
       return `
-        <text x="${lx}" y="${midY-8}" dominant-baseline="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="600" fill="${colText}">${d.name}</text>
-        <text x="${lx}" y="${midY+8}" dominant-baseline="middle" font-family="DM Mono,monospace" font-size="10" fill="${d.color}">${eur(d.val)}  ·  ${pct}%</text>`;
-    }).join('');
+        <text x="${lx}" y="${midY - 8}" dominant-baseline="middle" font-family="Instrument Sans,sans-serif" font-size="12" font-weight="600" fill="${colText}">${d.name}</text>
+        <text x="${lx}" y="${midY + 8}" dominant-baseline="middle" font-family="DM Mono,monospace" font-size="10" fill="${d.color}">${eur(d.val)}  ·  ${pct}%</text>`;
+    }).join("");
 
     sankeyWrap.innerHTML = `
       <svg viewBox="0 0 ${TOTAL_W} ${svgH}" width="100%" height="${svgH}" style="overflow:visible;display:block">
-        <defs><style>text { user-select:none; }</style></defs>
-        ${pathsL.join('')}
-        ${pathsR.join('')}
-        ${srcRects}
-        ${ctrRects}
+        <defs>
+          <style>text { user-select:none; }</style>
+        </defs>
+        ${paths.join("\n")}
+        ${srcRect}
         ${dstRects}
-        ${srcLabels}
+        ${srcLabel}
         ${dstLabels}
       </svg>`;
   };
 
   // Render après insertion DOM
-  requestAnimationFrame(() => { buildSankey(); updateSankeyAlert(); });
+  requestAnimationFrame(() => { buildSankey(); });
 
   // ══════════════════════════════════════════════════════════════════════════
   // État partagé des montants courants (mis à jour par les toggles)
@@ -4269,23 +4092,21 @@ function virements(c) {
   // curCC[i] et curLiv[i] = montant actuellement affiché pour chaque ligne
   const curCC  = rowsCC.map(r => r.montant);
   const curLiv = rowsLiv.map(r => r.montant);
-  const curInv = rowsInv.map(r => r.montant);
 
   // Registres DOM : amtEl et totalEl par groupe, pour les mises à jour
   const amtElsCC  = {}; // nom → élément DOM montant (CC)
   const amtElsLiv = {}; // nom → élément DOM montant (Livrets)
-  const amtElsInv = {}; // nom → élément DOM montant (Invest)
   let totalElCC  = null;
   let totalElLiv = null;
   let totalElInv = null;
 
   // Recalcul central : CC1 absorbe le reste, puis met à jour tous les DOM
   const recalcAll = () => {
-    const salaireNow = (D.virements.revenusComplementaires || []).reduce((s,r) => s + (r.amount||0), 0);
+    const salaireNow = D.virements.salaireMensuel || 0;
     const cc1Idx = rowsCC.findIndex(r => r.isCC1);
     const totalAutresCC = curCC.reduce((s, v, i) => i === cc1Idx ? s : s + v, 0);
     const totalLivCur   = curLiv.reduce((s, v) => s + v, 0);
-    const totalInvCur   = s2ok ? budgetInv : 0;
+    const totalInvCur   = totalInv;
     const newCC1 = salaireNow - totalAutresCC - totalLivCur - totalInvCur;
 
     if (cc1Idx !== -1) {
@@ -4297,10 +4118,9 @@ function virements(c) {
 
     if (totalElCC)  totalElCC.textContent  = eur(totalAutresCC + newCC1);
     if (totalElLiv) totalElLiv.textContent = eur(totalLivCur);
-    if (totalElInv) totalElInv.textContent = eur(s2ok ? budgetInv : 0);
+    if (totalElInv) totalElInv.textContent = eur(totalInvCur);
 
     buildSankey();
-    updateSankeyAlert();
   };
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -4363,7 +4183,6 @@ function virements(c) {
         amtEl.textContent = eur(row.montant);
         if (isCC)       amtElsCC[row.name]  = amtEl;
         else if (isLiv) amtElsLiv[row.name] = amtEl;
-        else            amtElsInv[row.name] = amtEl;
 
         const arrBtn = document.createElement("button");
         arrBtn.className = `toggle-sw${row.arrondi && !row.isCC1 ? " on" : ""}`;
@@ -4382,7 +4201,6 @@ function virements(c) {
           // Mettre à jour l'état partagé
           if (isCC)       curCC[rowIdx]  = newMontant;
           else if (isLiv) curLiv[rowIdx] = newMontant;
-          else            { curInv[rowIdx] = newMontant; D.virements.investissementsRep[row.name] = newMontant; }
 
           recalcAll();
           saveData();
@@ -4402,105 +4220,7 @@ function virements(c) {
   // ── Affichage des 3 groupes ───────────────────────────────────────────────
   c.appendChild(buildFluxGroup("Virements comptes courants", rowsCC, "var(--chart5)", totalCCHeader, true,  false));
   c.appendChild(buildFluxGroup("Virements livrets",          rowsLiv, "var(--chart2)", totalLiv,     false, true));
-  // ── Card Virements investissements — répartition via % cibles Bourse ────────
-  {
-    const secToDcaVir = { etfPositions:'dcaETF', stockPositions:'dcaActions', cryptoPositions:'dcaCrypto' };
-    const autoInvestByAccount = {};
-    ['etfPositions','stockPositions','cryptoPositions'].forEach(sec => {
-      const dcaKey = secToDcaVir[sec];
-      const dcaPct = dcaKey ? (D.virements[dcaKey] || 0) : 0;
-      (D[sec]||[]).forEach(pos => {
-        if (!pos.autoInvest || !pos.account || !pos.target || !dcaPct) return;
-        const montant = Math.round(budgetInv * (dcaPct/100) * (pos.target/100) * 100) / 100;
-        autoInvestByAccount[pos.account] = (autoInvestByAccount[pos.account] || 0) + montant;
-      });
-    });
-
-    const computeInvMontants = () => rowsInv.map(row =>
-      Math.round((autoInvestByAccount[row.name] || 0) * 100) / 100
-    );
-
-    const invCard = document.createElement("div"); invCard.className = "card";
-    invCard.style.padding = "0";
-
-    const invHeader = document.createElement("div");
-    invHeader.className = "card-title";
-    invHeader.style.cssText = "margin:0;border-bottom:1px solid var(--border)";
-    invHeader.innerHTML = `
-      <span>Virements investissements</span>
-      <span id="vir-total-Virements-investissements" style="font-family:var(--font-mono);color:var(--amber)">${eur(budgetInv)}</span>`;
-    setTimeout(() => { totalElInv = document.getElementById("vir-total-Virements-investissements"); }, 0);
-    invCard.appendChild(invHeader);
-
-    const invBody = document.createElement("div");
-    invBody.style.cssText = "padding:6px 0";
-
-    if (!s2ok) {
-      const empty = document.createElement("div");
-      empty.style.cssText = "padding:16px 18px;font-size:var(--text-md);color:var(--text3);text-align:center";
-      empty.textContent = !s1ok ? "Budget redirigé vers le remboursement des dettes (étape 1)" : "Budget redirigé vers le matelas de sécurité (étape 2)";
-      invBody.appendChild(empty);
-    } else if (rowsInv.length === 0) {
-      const empty = document.createElement("div");
-      empty.style.cssText = "padding:16px 18px;font-size:var(--text-md);color:var(--text3);text-align:center";
-      empty.textContent = "Aucun compte d'investissement configuré";
-      invBody.appendChild(empty);
-    } else {
-      const computed = computeInvMontants();
-      const totalAutoInv = computed.reduce((s,v) => s+v, 0);
-      const resteInv = Math.round((budgetInv - totalAutoInv) * 100) / 100;
-      computed.forEach((v, i) => { curInv[i] = v; });
-
-      const resteRow = document.createElement("div");
-      resteRow.className = "vir-flux-row";
-      const resteLeft = document.createElement("div");
-      resteLeft.style.cssText = "display:flex;align-items:center;gap:9px;flex:1;min-width:0";
-      resteLeft.innerHTML = `
-        <svg width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="1.5" viewBox="0 0 24 24" style="flex-shrink:0">
-          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>
-        </svg>
-        <div class="vir-flux-name">Reste à investir</div>`;
-      const resteAmt = document.createElement("div");
-      resteAmt.className = `vir-flux-amount${resteInv < 0 ? " zero" : ""}`;
-      if (resteInv < 0) resteAmt.style.color = "var(--loss)";
-      resteAmt.textContent = eur(resteInv);
-      resteRow.appendChild(resteLeft); resteRow.appendChild(resteAmt);
-      invBody.appendChild(resteRow);
-
-      rowsInv.forEach((row, rowIdx) => {
-        const r = document.createElement("div"); r.className = "vir-flux-row";
-        const left = document.createElement("div");
-        left.style.cssText = "display:flex;align-items:center;gap:9px;flex:1;min-width:0";
-        left.innerHTML = `
-          <svg width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="1.5" viewBox="0 0 24 24" style="flex-shrink:0">
-            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>
-          </svg>
-          <div class="vir-flux-name">Virement vers ${row.name}</div>`;
-        const pill = document.createElement("span");
-        pill.style.cssText = `font-size:var(--text-md);font-weight:600;padding:2px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:${row.color}15;border:1px solid ${row.color}45;color:${row.color};max-width:110px;overflow:hidden;text-overflow:ellipsis`;
-        pill.textContent = row.bank; pill.title = row.bank;
-        const montant = computed[rowIdx];
-        const amtEl = document.createElement("div");
-        amtEl.className = `vir-flux-amount${montant === 0 ? " zero" : ""}`;
-        amtEl.textContent = eur(montant);
-        amtElsInv[row.name] = amtEl;
-        r.appendChild(left); r.appendChild(pill); r.appendChild(amtEl);
-        invBody.appendChild(r);
-      });
-
-      if (totalAutoInv === 0) {
-        const hint = document.createElement("div");
-        hint.style.cssText = "padding:10px 16px;font-size:var(--text-sm);color:var(--text3);text-align:center";
-        hint.textContent = "Cochez \"Investissement auto\" sur vos actifs dans l'onglet Bourse pour répartir automatiquement";
-        invBody.appendChild(hint);
-      }
-
-      recalcAll();
-    }
-
-    invCard.appendChild(invBody);
-    c.appendChild(invCard);
-  }
+  c.appendChild(buildFluxGroup("Virements investissements",  s2ok ? [{ name: "Investissements (DCA)", bank: "—", color: "var(--amber)", raw: budgetInv, montant: budgetInv, arrondi: false, isCC1: false }] : [], "var(--chart1)", totalInv, false, false));
 
   // ── Bouton "Faire les virements" ─────────────────────────────────────────
   const virBtnWrap = document.createElement("div");
@@ -5017,13 +4737,6 @@ function investissements(c) {
               <input class="form-input" type="number" step="0.1" min="0" max="100" id="pos-target" placeholder="—" value="${d.target??''}">
             </div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-              <input type="checkbox" id="pos-auto-invest" ${d.autoInvest?"checked":""} style="accent-color:var(--amber);width:15px;height:15px;flex-shrink:0">
-              <span style="font-size:var(--text-md);color:var(--text)">Investissement auto</span>
-            </label>
-            <span id="pos-auto-amount" style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--amber);display:none"></span>
-          </div>
           <div class="form-actions" style="margin-top:4px;padding:0;display:grid;grid-template-columns:${isEdit ? "1fr 1fr 1fr" : "1fr 1fr"};gap:8px">
             ${isEdit?`<button class="app-btn app-btn--rect" id="pos-delete" style="background:var(--loss);border-color:var(--loss);color:var(--text)">Supprimer</button>`:""}
             <button class="app-btn app-btn--rect" id="pos-cancel">Annuler</button>
@@ -5107,35 +4820,6 @@ function investissements(c) {
 
     const close = () => overlay.remove();
     overlay.addEventListener("pointerdown", e => { if (e.target === overlay) close(); });
-    // ── Calcul montant invest auto ───────────────────────────────────────────
-    const secToDcaKey = { etfPositions: 'dcaETF', stockPositions: 'dcaActions', cryptoPositions: 'dcaCrypto' };
-    const updateAutoAmount = () => {
-      const amountEl = document.getElementById('pos-auto-amount');
-      const checkbox = document.getElementById('pos-auto-invest');
-      const targetInput = document.getElementById('pos-target');
-      if (!amountEl || !checkbox) return;
-      const isChecked = checkbox.checked;
-      const target = parseFloat(targetInput?.value) || 0;
-      const section = document.getElementById('pos-section')?.value || defaultSec;
-      const dcaKey = secToDcaKey[section];
-      const dcaPct = dcaKey ? (D.virements[dcaKey] || 0) : 0;
-      const budget = D.budgetInvestissement || 0;
-      if (isChecked && target > 0 && dcaPct > 0) {
-        const montant = Math.round(budget * (dcaPct/100) * (target/100) * 100) / 100;
-        amountEl.textContent = eur(montant) + ' / mois';
-        amountEl.style.display = 'inline';
-      } else if (isChecked && (target <= 0 || !dcaPct)) {
-        amountEl.textContent = '⚠ % objectif ou DCA manquant';
-        amountEl.style.cssText = 'font-size:var(--text-sm);color:var(--amber);display:inline';
-      } else {
-        amountEl.style.display = 'none';
-      }
-    };
-    document.getElementById('pos-auto-invest')?.addEventListener('change', updateAutoAmount);
-    document.getElementById('pos-target')?.addEventListener('input', updateAutoAmount);
-    document.getElementById('pos-section')?.addEventListener('change', updateAutoAmount);
-    updateAutoAmount();
-
     document.getElementById("pos-cancel").addEventListener("click", close);
 
     if (isEdit) {
@@ -5161,7 +4845,6 @@ function investissements(c) {
       const category     = document.getElementById("pos-category").value || "";
       const targetRaw    = document.getElementById("pos-target").value;
       const target       = targetRaw !== "" ? parseFloat(targetRaw) : null;
-      const autoInvest   = document.getElementById("pos-auto-invest")?.checked || false;
       const price        = parseFloat(document.getElementById("pos-price")?.value) || (d.price || 0);
       if (!name) { toast("Le nom est requis"); return; }
       const market = qty * price;
@@ -5172,7 +4855,7 @@ function investissements(c) {
       const perf   = cost > 0 ? (market/cost - 1)*100 : 0;
       const allPos = D[section] || [];
       const totalMkt = allPos.reduce((s,p) => s+(p.market||0), 0) + (isEdit ? 0 : market);
-      const entry = { account, name, ticker, category, target, autoInvest, qty, pru, pruCurrency, price, cost, market, pnl, perf, weight: totalMkt > 0 ? market/totalMkt*100 : 0 };
+      const entry = { account, name, ticker, category, target, qty, pru, pruCurrency, price, cost, market, pnl, perf, weight: totalMkt > 0 ? market/totalMkt*100 : 0 };
       if (isEdit) {
         const idx = D[existingSection].indexOf(existingPos);
         if (existingSection !== section) {
@@ -5239,15 +4922,6 @@ function investissements(c) {
     const liveMkt  = sum(livePositions, "market");
     const livePnl  = sum(livePositions, "pnl");
     const liveCost = sum(livePositions, "cost");
-    const secToDcaTfoot = { etfPositions:'dcaETF', stockPositions:'dcaActions', cryptoPositions:'dcaCrypto' };
-    const dcaKeyFoot = secToDcaTfoot[section];
-    const dcaPctFoot = dcaKeyFoot ? (D.virements[dcaKeyFoot] || 0) : 0;
-    const budgetFoot = D.budgetInvestissement || 0;
-    const totalTarget = livePositions.reduce((s,p) => s + (p.target != null && p.target !== "" ? parseFloat(p.target)||0 : 0), 0);
-    const totalAutoInvest = livePositions.reduce((s,p) => {
-      if (!p.autoInvest || !p.target || !dcaPctFoot) return s;
-      return s + Math.round(budgetFoot * (dcaPctFoot/100) * (p.target/100) * 100) / 100;
-    }, 0);
     const totals = { market: liveMkt, pnl: livePnl, perf: liveCost > 0 ? (liveMkt/liveCost-1)*100 : 0 };
     const accountSource = section === "cryptoPositions" ? (D.cryptoAccounts||[]) : (D.liquiditesInvest||[]);
     const accountOptions = accountSource.map(a => a.name);
@@ -5256,7 +4930,7 @@ function investissements(c) {
     table.className = "invest-table";
     table.innerHTML = `<thead><tr>
       <th>Compte</th><th>Nom</th>
-      <th>Catégorie</th><th>Obj.</th><th style="white-space:nowrap">Inv. auto</th><th>Qté</th><th>PRU</th><th>Prix</th>
+      <th>Catégorie</th><th>Obj.</th><th>Qté</th><th>PRU</th><th>Prix</th>
       <th style="white-space:nowrap">Valeur mkt</th><th>P&L</th><th>Perf.</th><th>Poids</th><th></th>
     </tr></thead>`;
     const tbody = document.createElement("tbody");
@@ -5269,17 +4943,6 @@ function investissements(c) {
         <td>${p.name} <span style="color:var(--text3)">${p.ticker}</span>${p._tickerError ? ` <span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;padding:1px 5px;font-family:var(--font-body)">⚠ ticker</span>` : ""}</td>
         <td><span style="font-size:var(--text-md);color:var(--text3);border:1px solid var(--border2);border-radius:20px;padding:1px 8px;white-space:nowrap">${p.category||"—"}</span></td>
         <td style="color:var(--text2);font-family:var(--font-mono)">${p.target != null && p.target !== "" ? p.target+"%" : "—"}</td>
-        <td style="font-family:var(--font-mono);white-space:nowrap">${(() => {
-          if (!p.autoInvest) return '<span style="color:var(--text3)">—</span>';
-          const secToDca = { etfPositions:'dcaETF', stockPositions:'dcaActions', cryptoPositions:'dcaCrypto' };
-          const dcaKey = secToDca[section];
-          const dcaPct = dcaKey ? (D.virements[dcaKey] || 0) : 0;
-          const budget = D.budgetInvestissement || 0;
-          const t = p.target;
-          if (!t || !dcaPct) return '<span style="color:var(--amber);font-size:var(--text-sm)">⚠ —</span>';
-          const montant = Math.round(budget * (dcaPct/100) * (t/100) * 100) / 100;
-          return '<span style="color:var(--amber)">' + eur(montant) + '</span>';
-        })()}</td>
         <td>${(p.qty||0).toLocaleString("fr-FR",{maximumFractionDigits:4})}</td>
         <td>${eur((p.pruCurrency && p.pruCurrency !== "EUR") ? p.pru * (fxRates[p.pruCurrency]||1) : p.pru||0)}</td>
         <td data-live="price">${eur(p.price||0)}</td>
@@ -5298,9 +4961,7 @@ function investissements(c) {
     });
     const tfoot = document.createElement("tfoot");
     tfoot.innerHTML = `<tr>
-      <td colspan="3" style="text-align:left;letter-spacing:.05em;text-transform:uppercase;color:var(--amber)">Total</td>
-      <td style="text-align:right;font-family:var(--font-mono);color:var(--text2)">${totalTarget > 0 ? totalTarget.toFixed(1)+"%" : "—"}</td>
-      <td style="text-align:right;font-family:var(--font-mono);color:var(--amber)">${totalAutoInvest > 0 ? eur(totalAutoInvest) : "—"}</td>
+      <td colspan="4" style="text-align:left;letter-spacing:.05em;text-transform:uppercase;color:var(--amber)">Total</td>
       <td></td><td></td><td></td>
       <td data-live="total-market" style="color:var(--amber);text-align:right">${eur(totals.market)}</td>
       <td data-live="total-pnl" class="${totals.pnl>=0?'text-gain':'text-loss'}" style="text-align:right">${eur(totals.pnl)}</td>
@@ -5490,120 +5151,65 @@ function calcMensualite(capital, tauxAnnuel, dureeM) {
   return capital * tm / (1 - Math.pow(1 + tm, -dureeM));
 }
 
-// ── Moteur CreditSim complet ───────────────────────────────────────────────
 function buildAmortTable(loan) {
-  const round2 = v => Math.round(v * 100) / 100;
+  const tm = loan.rate / 100 / 12;
+  const mensualite = calcMensualite(loan.loanAmount, loan.rate, loan.duration);
+  const tauxAssuranceMensuel = (loan.insuranceRate || 0) / 100 / 12;
 
-  const loanAmount       = loan.loanAmount || 0;
-  const rate             = loan.rate || 0;
-  const duration         = loan.duration || 0;  // mois d'amortissement purs
-  const startStr         = loan.startDate || "";
-  const prefundingMonths = loan.prefundingMonths || 0;
-  const prefundingFee    = loan.prefundingFee    || 0;
-  const deferredMonths   = loan.deferredMonths   || 0;
-  const deferredFee      = loan.deferredFee      || 0;
-  const initialInsurance = loan.initialInsurance || 0;
-  const hasContractual   = !!loan.contractualTotal;
-  const contractualTotal = loan.contractualTotal || 0;
-  const hasInsChange     = !!loan.insuranceChangeMo;
-  const insuranceChangeMo= loan.insuranceChangeMo || null;
-  const insuranceRate2   = loan.insuranceRate2   || 0;
+  const startParts = (loan.startDate || "2020-01").split("-");
+  let year = parseInt(startParts[0]);
+  let month = parseInt(startParts[1]);
 
-  const r = rate / 100 / 12;
-  const amortMonths = duration;
-
-  // Capital post-différé
-  const interetsMensuel = round2(loanAmount * r);
-  const capitalPostDeferred = round2(loanAmount + interetsMensuel * deferredMonths);
-
-  // Mensualité de base
-  let mensualiteBase;
-  if (r === 0) {
-    mensualiteBase = capitalPostDeferred / amortMonths;
-  } else {
-    mensualiteBase = capitalPostDeferred * r * Math.pow(1+r, amortMonths) / (Math.pow(1+r, amortMonths) - 1);
-  }
-
-  // Taux assurance déduit
-  const insuranceRate = capitalPostDeferred > 0 ? (initialInsurance / capitalPostDeferred) * 12 : 0;
-
-  // Date helpers
-  let [startYear, startMonth] = startStr ? startStr.split("-").map(Number) : [new Date().getFullYear(), new Date().getMonth() + 1];
-  let curYear = startYear, curMonth = startMonth;
-  const addMonth = () => { curMonth++; if (curMonth > 12) { curMonth = 1; curYear++; } };
-  const fmtDate  = () => `${String(curMonth).padStart(2,"0")}/${curYear}`;
-  const now = new Date();
-  const isCurrentMonth = () => curYear === now.getFullYear() && curMonth === now.getMonth() + 1;
-
+  let capitalRestant = loan.loanAmount;
+  let totalCapitalAmorti = 0;
   const rows = [];
 
-  // Phase préfinancement
-  for (let m = 0; m < prefundingMonths; m++) {
-    rows.push({ date: fmtDate(), phase: "prefunding", total: prefundingFee, capitalAmorti: 0, partInteret: 0, assurance: prefundingFee, capitalRestant: loanAmount, totalCapitalAmorti: 0, isCurrent: isCurrentMonth(), interetsCompens: 0 });
-    addMonth();
+  for (let i = 0; i < loan.duration; i++) {
+    const partInteret = capitalRestant * tm;
+    const capitalAmorti = mensualite - partInteret;
+    const assurance = loan.loanAmount * tauxAssuranceMensuel;
+    const totalEcheance = mensualite + assurance;
+    totalCapitalAmorti += capitalAmorti;
+    capitalRestant -= capitalAmorti;
+
+    const mStr = String(month).padStart(2, "0");
+    rows.push({
+      echeance: i + 1,
+      date: `${mStr}/${year}`,
+      totalEcheance,
+      capitalAmorti,
+      partInteret,
+      assurance,
+      capitalRestant: Math.max(0, capitalRestant),
+      totalCapitalAmorti,
+    });
+
+    month++;
+    if (month > 12) { month = 1; year++; }
   }
-
-  // Phase différé
-  let interetsCumul = 0;
-  for (let m = 0; m < deferredMonths; m++) {
-    interetsCumul += interetsMensuel;
-    const isLast = m === deferredMonths - 1;
-    rows.push({ date: fmtDate(), phase: "deferred", total: deferredFee, capitalAmorti: 0, partInteret: 0, assurance: deferredFee, capitalRestant: isLast ? capitalPostDeferred : loanAmount, totalCapitalAmorti: 0, isCurrent: isCurrentMonth(), interetsCompens: isLast ? 0 : round2(interetsCumul) });
-    addMonth();
-  }
-
-  // Phase amortissement
-  let capitalRestant = capitalPostDeferred;
-  let totalCapitalAmorti = 0;
-  const assuranceInitiale = initialInsurance;
-
-  for (let m = 0; m < amortMonths; m++) {
-    const mAmort = m + 1;
-    const partInteret = round2(capitalRestant * r);
-    let capitalAmorti, totalEcheance;
-
-    // Assurance : taux original pour le calcul du capital, taux nouveau pour l'affichage
-    const assuCalculee = round2(capitalRestant * (insuranceRate / 12));
-    const assuAffichee = (hasInsChange && insuranceChangeMo && mAmort >= insuranceChangeMo)
-      ? round2(capitalRestant * (insuranceRate2 / 100 / 12))
-      : assuCalculee;
-
-    capitalAmorti = hasContractual
-      ? round2(contractualTotal - assuCalculee - partInteret)
-      : round2(mensualiteBase - partInteret);
-    totalEcheance = round2(capitalAmorti + partInteret + assuAffichee);
-    const assurance = assuAffichee;
-
-    capitalRestant = round2(Math.max(0, capitalRestant - capitalAmorti));
-    totalCapitalAmorti = round2(totalCapitalAmorti + capitalAmorti);
-
-    rows.push({ date: fmtDate(), phase: "amort", total: totalEcheance, capitalAmorti, partInteret, assurance, capitalRestant, totalCapitalAmorti, isCurrent: isCurrentMonth(), interetsCompens: 0 });
-    addMonth();
-  }
-
-  const mensualite = mensualiteBase;
-  return { rows, mensualite, capitalPostDeferred, insuranceRate, prefundingMonths, deferredMonths, amortMonths };
+  return { rows, mensualite };
 }
 
 function loanKPIs(loan) {
-  const { rows, mensualite, capitalPostDeferred, insuranceRate } = buildAmortTable(loan);
+  const { rows, mensualite } = buildAmortTable(loan);
+  const tauxAssuranceMensuel = (loan.insuranceRate || 0) / 100 / 12;
+  const assuranceMensuelle = loan.loanAmount * tauxAssuranceMensuel;
 
-  // Trouver la ligne courante via isCurrent
-  const currentIdx = rows.findIndex(r => r.isCurrent);
-  const currentRow = currentIdx >= 0 ? currentIdx + 1 : rows.filter(r => r.phase === "amort" || r.phase === "deferred" || r.phase === "prefunding").length;
+  // Trouver l'échéance actuelle (mois courant)
+  const now = new Date();
+  const startParts = (loan.startDate || "2020-01").split("-");
+  const startYear = parseInt(startParts[0]);
+  const startMonth = parseInt(startParts[1]);
+  const monthsElapsed = (now.getFullYear() - startYear) * 12 + (now.getMonth() + 1 - startMonth);
+  const currentRow = Math.min(Math.max(monthsElapsed, 0), rows.length);
 
-  // Capital amorti = totalCapitalAmorti de la ligne courante (phase amort seulement)
-  const currentRowData = currentIdx >= 0 ? rows[currentIdx] : null;
-  const capitalAmortiADate = currentRowData?.totalCapitalAmorti ?? 0;
-  const capitalRestantADate = currentRowData?.capitalRestant ?? loan.loanAmount;
-  const pct = loan.loanAmount > 0 ? (capitalAmortiADate / loan.loanAmount) * 100 : 0;
+  const capitalAmortiADate = currentRow > 0 ? rows[currentRow - 1].totalCapitalAmorti : 0;
+  const capitalRestantADate = loan.loanAmount - capitalAmortiADate;
+  const pct = (capitalAmortiADate / loan.loanAmount) * 100;
 
-  const totalInteret = rows.reduce((s, r) => s + (r.partInteret || 0), 0);
-  const totalAssurance = rows.reduce((s, r) => s + (r.assurance || 0), 0);
+  const totalInteret = rows.reduce((s, r) => s + r.partInteret, 0);
+  const totalAssurance = rows.reduce((s, r) => s + r.assurance, 0);
   const coutTotal = totalInteret + totalAssurance;
-
-  // Mensualité actuelle (phase amort, ligne courante)
-  const mensualiteActuelle = currentRowData?.phase === "amort" ? currentRowData.total : (mensualite || 0);
 
   const endDate = rows.length > 0 ? rows[rows.length - 1].date : "—";
   const bien = [...(D.immobilierBiens||[]), ...(D.investImmo||[])].find(b => b.id === loan.immobilierBienId);
@@ -5611,11 +5217,10 @@ function loanKPIs(loan) {
   const valeurNette = prixRef - capitalRestantADate;
 
   return {
-    mensualite, mensualiteActuelle, mensualiteTotal: mensualiteActuelle,
+    mensualite, mensualiteTotal: mensualite + assuranceMensuelle,
     capitalAmortiADate, capitalRestantADate, pct,
     coutTotal, totalInteret, totalAssurance,
-    endDate, valeurNette, currentRow, rows, capitalPostDeferred,
-    amortMonths: rows.filter(r => r.phase === "amort").length,
+    endDate, valeurNette, currentRow, rows,
   };
 }
 
@@ -5625,6 +5230,7 @@ function loanKPIs(loan) {
 // ── Formulaire crédit ────────────────────────────────────────────────────────
 
 function openCreditForm(existingLoan = null) {
+  // Remove any existing modal
   document.getElementById("credit-form-overlay")?.remove();
 
   const overlay = document.createElement("div");
@@ -5635,10 +5241,13 @@ function openCreditForm(existingLoan = null) {
   const d = existingLoan || {};
 
   const tousBiens = [...(D.immobilierBiens||[]), ...(D.investImmo||[])];
+  // Assigner un id numérique à tout bien qui n'en aurait pas
   tousBiens.forEach((b, i) => { if (!b.id) b.id = Date.now() + i; });
 
   const biensDisponibles = tousBiens.filter(b => {
+    // En édition : inclure le bien actuellement lié à ce crédit
     if (isEdit && b.id === existingLoan.immobilierBienId) return true;
+    // Exclure les biens déjà liés à un autre crédit
     return !(D.loans||[]).some(l => l.id !== (existingLoan?.id) && l.immobilierBienId === b.id);
   });
 
@@ -5653,26 +5262,24 @@ function openCreditForm(existingLoan = null) {
     return `<option value="${b.id}" ${sel}>${b.name} — ${eur(valAff)}</option>`;
   }).join('');
 
-  // Toggle HTML helper
-  const toggleSection = (id, label, hint, fieldsHtml, checked=false) => `
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="${id}" ${checked?"checked":""} style="accent-color:var(--amber);width:14px;height:14px;flex-shrink:0">
-        <span style="font-size:var(--text-md);color:var(--text);font-weight:500">${label}</span>
-      </label>
-      ${hint ? `<p style="font-size:var(--text-sm);color:var(--text3);margin:0" id="${id}-hint">${hint}</p>` : ""}
-      <div id="${id}-fields" style="display:${checked?"flex":"none"};flex-direction:column;gap:10px">${fieldsHtml}</div>
-    </div>`;
-
   overlay.innerHTML = `
-    <div class="credit-form-modal" style="max-width:520px">
+    <div class="credit-form-modal">
       <h3>${isEdit ? "Modifier le crédit" : "Ajouter un crédit"}</h3>
 
       <div class="form-section-title" style="color:var(--amber);border-color:var(--amber)">Bien immobilier associé</div>
       <div class="form-grid">
-        <div class="form-group">
+        <div class="form-group full">
           <label>Bien immobilier</label>
           <select id="cf-bien">${bienOptions}</select>
+          <div class="form-hint">Gérez vos biens dans l'onglet Patrimoine → section Immobilier</div>
+        </div>
+      </div>
+
+      <div class="form-section-title" style="color:var(--amber);border-color:var(--amber)">Identification</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date de début</label>
+          <input id="cf-start" type="month" value="${d.startDate||""}">
         </div>
         <div class="form-group">
           <label>Banque</label>
@@ -5713,68 +5320,30 @@ function openCreditForm(existingLoan = null) {
       <div class="form-section-title" style="color:var(--amber);border-color:var(--amber)">Paramètres du crédit</div>
       <div class="form-grid">
         <div class="form-group">
-          <label>Date de début</label>
-          <input id="cf-start" type="month" value="${d.startDate||""}">
+          <label>Taux d'intérêt nominal (%)</label>
+          <input id="cf-rate" type="number" step="0.01" placeholder="2.00" value="${d.rate != null ? d.rate : ''}">
         </div>
         <div class="form-group">
-          <label>Taux nominal (%/an)</label>
-          <input id="cf-rate" type="number" step="0.01" placeholder="1.67" value="${d.rate != null ? d.rate : ''}">
-        </div>
-        <div class="form-group full">
-          <label>Durée amortissement (mois)</label>
+          <label>Durée totale (mois)</label>
           <input id="cf-duration" type="number" step="1" placeholder="240" value="${d.duration != null ? d.duration : ''}">
         </div>
-      </div>
-
-      <div class="form-section-title" style="color:var(--amber);border-color:var(--amber)">Type de mensualité</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:3px;gap:3px;margin-bottom:4px">
-        <input type="radio" name="cf-model" id="cf-model-calc" value="calc" ${!d.contractualTotal?"checked":""} style="display:none">
-        <label for="cf-model-calc" id="cf-model-calc-label" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;border-radius:6px;cursor:pointer;text-align:center;${!d.contractualTotal?"background:var(--surface2);border:1px solid var(--border2)":""}">
-          <span style="font-size:var(--text-md);font-weight:600;color:${!d.contractualTotal?"var(--amber)":"var(--text2)"}">Mens. calculée</span>
-          <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">cap + intérêts</span>
-        </label>
-        <input type="radio" name="cf-model" id="cf-model-contractual" value="contractual" ${d.contractualTotal?"checked":""} style="display:none">
-        <label for="cf-model-contractual" id="cf-model-contractual-label" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;border-radius:6px;cursor:pointer;text-align:center;${d.contractualTotal?"background:var(--surface2);border:1px solid var(--border2)":""}">
-          <span style="font-size:var(--text-md);font-weight:600;color:${d.contractualTotal?"var(--amber)":"var(--text2)"}">Mens. contractuelle</span>
-          <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">mensualité fixe</span>
-        </label>
-      </div>
-      <div id="cf-contractual-fields" style="display:${d.contractualTotal?"block":"none"};margin-bottom:4px">
-        <div class="form-grid"><div class="form-group full">
-          <label>Mensualité contractuelle (€)</label>
-          <input id="cf-contractual" type="number" step="0.01" placeholder="750.00" value="${d.contractualTotal||''}">
-        </div></div>
-      </div>
-
-      <div class="form-section-title" style="color:var(--amber);border-color:var(--amber)">Phases optionnelles</div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        ${toggleSection("cf-cb-prefunding","Phase de préfinancement","Capital figé, seuls les frais sont prélevés.",`
-          <div class="form-grid">
-            <div class="form-group"><label>Durée (mois)</label><input id="cf-prefunding-months" type="number" step="1" placeholder="13" value="${d.prefundingMonths||''}"></div>
-            <div class="form-group"><label>Frais mensuels (€)</label><input id="cf-prefunding-fee" type="number" step="0.01" placeholder="73.00" value="${d.prefundingFee||''}"></div>
-          </div>`, !!d.prefundingMonths)}
-        ${toggleSection("cf-cb-deferred","Phase de différé total","Intérêts compensatoires capitalisés, le capital gonfle.",`
-          <div class="form-grid">
-            <div class="form-group"><label>Durée (mois)</label><input id="cf-deferred-months" type="number" step="1" placeholder="3" value="${d.deferredMonths||''}"></div>
-            <div class="form-group"><label>Frais mensuels (€)</label><input id="cf-deferred-fee" type="number" step="0.01" placeholder="73.00" value="${d.deferredFee||''}"></div>
-          </div>`, !!d.deferredMonths)}
+        <div class="form-group full">
+          <label>Mensualité hors assurance</label>
+          <span class="form-result" id="cf-monthly-display">—</span>
+        </div>
       </div>
 
       <div class="form-section-title" style="color:var(--amber);border-color:var(--amber)">Assurance</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div class="form-grid">
-          <div class="form-group full">
-            <label>Montant assurance initiale (€/mois)</label>
-            <input id="cf-initial-insurance" type="number" step="0.01" placeholder="73.88" value="${d.initialInsurance||''}">
-          </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Taux assurance (%/an)</label>
+          <input id="cf-insurance" type="number" step="0.01" placeholder="0.36" value="${d.insuranceRate != null ? d.insuranceRate : ''}">
         </div>
-        ${toggleSection("cf-cb-ins-change","Remplacement de l'assurance","",`
-          <div class="form-grid">
-            <div class="form-group"><label>À partir du mois n° (amort.)</label><input id="cf-insurance-change-month" type="number" step="1" placeholder="24" value="${d.insuranceChangeMo||''}"></div>
-            <div class="form-group"><label>Nouveau taux (%/an)</label><input id="cf-insurance-rate2" type="number" step="0.001" placeholder="0.25" value="${d.insuranceRate2||''}"></div>
-          </div>`, !!d.insuranceChangeMo)}
+        <div class="form-group full">
+          <label>Mensualité totale assurance comprise</label>
+          <span class="form-result" id="cf-total-monthly-display">—</span>
+        </div>
       </div>
-
       <div class="form-footer">
         <button class="app-btn app-btn--rect" id="cf-cancel">Annuler</button>
         <button class="app-btn app-btn--rect app-btn--primary" id="cf-save">${isEdit ? "Enregistrer" : "Créer le crédit"}</button>
@@ -5783,31 +5352,10 @@ function openCreditForm(existingLoan = null) {
 
   document.body.appendChild(overlay);
 
-  // ── Toggle sections ──
-  ["cf-cb-prefunding","cf-cb-deferred","cf-cb-ins-change"].forEach(id => {
-    const cb = document.getElementById(id);
-    const fields = document.getElementById(id + "-fields");
-    if (cb && fields) cb.addEventListener("change", () => { fields.style.display = cb.checked ? "flex" : "none"; fields.style.flexDirection = "column"; fields.style.gap = "10px"; });
-  });
-
-  // ── Model toggle ──
-  const updateModelToggle = () => {
-    const isContractual = document.getElementById("cf-model-contractual").checked;
-    const lCalc = document.getElementById("cf-model-calc-label");
-    const lContr = document.getElementById("cf-model-contractual-label");
-    const cFields = document.getElementById("cf-contractual-fields");
-    lCalc.style.background = !isContractual ? "var(--surface2)" : "";
-    lCalc.style.border = !isContractual ? "1px solid var(--border2)" : "";
-    lCalc.querySelector("span").style.color = !isContractual ? "var(--amber)" : "var(--text2)";
-    lContr.style.background = isContractual ? "var(--surface2)" : "";
-    lContr.style.border = isContractual ? "1px solid var(--border2)" : "";
-    lContr.querySelector("span").style.color = isContractual ? "var(--amber)" : "var(--text2)";
-    cFields.style.display = isContractual ? "block" : "none";
-  };
-  document.querySelectorAll('input[name="cf-model"]').forEach(rb => rb.addEventListener("change", updateModelToggle));
-
-  // ── Loan amount calc ──
+  // ── Valeur calculée stockée en mémoire (utilisée à la sauvegarde)
   let _loanAmount = d.loanAmount || 0;
+
+  // Auto-calc loan amount
   const calcLoan = () => {
     const purchase  = parseFloat(document.getElementById("cf-purchase").value) || 0;
     const notary    = parseFloat(document.getElementById("cf-notary").value)   || 0;
@@ -5817,61 +5365,79 @@ function openCreditForm(existingLoan = null) {
     _loanAmount = purchase + notary + guarantee + dossier - apport;
     const el = document.getElementById("cf-loan-display");
     if (el) el.textContent = _loanAmount > 0 ? eur(_loanAmount) : "—";
+    calcMonthly();
   };
-  ["cf-purchase","cf-notary","cf-guarantee","cf-dossier","cf-apport"].forEach(id => document.getElementById(id)?.addEventListener("input", calcLoan));
 
-  if (isEdit && _loanAmount > 0) {
-    const el = document.getElementById("cf-loan-display");
-    if (el) el.textContent = eur(_loanAmount);
-  } else { calcLoan(); }
+  const calcMonthly = () => {
+    const loan      = _loanAmount;
+    const rate      = parseFloat(document.getElementById("cf-rate").value)     || 0;
+    const duration  = parseInt(document.getElementById("cf-duration").value)   || 0;
+    const insurance = parseFloat(document.getElementById("cf-insurance").value)|| 0;
+    const elM  = document.getElementById("cf-monthly-display");
+    const elT  = document.getElementById("cf-total-monthly-display");
+    if (loan > 0 && duration > 0) {
+      const m = calcMensualite(loan, rate, duration);
+      const assurMensuelle = loan * (insurance / 100 / 12);
+      const total = m + assurMensuelle;
+      if (elM) elM.textContent = eur(m);
+      if (elT) elT.textContent = eur(total);
+    } else {
+      if (elM) elM.textContent = "—";
+      if (elT) elT.textContent = "—";
+    }
+  };
+
+  ["cf-purchase","cf-notary","cf-guarantee","cf-dossier","cf-apport"].forEach(id =>
+    document.getElementById(id).addEventListener("input", calcLoan)
+  );
+  ["cf-rate","cf-duration","cf-insurance"].forEach(id =>
+    document.getElementById(id).addEventListener("input", calcMonthly)
+  );
+
+  // Init calculated fields
+  if (isEdit) {
+    // Afficher le montant du crédit existant
+    const _elLoan = document.getElementById("cf-loan-display");
+    if (_elLoan && _loanAmount > 0) _elLoan.textContent = eur(_loanAmount);
+    calcMonthly();
+  } else {
+    calcLoan();
+  }
 
   document.getElementById("cf-cancel").addEventListener("click", () => overlay.remove());
   overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
 
   document.getElementById("cf-save").addEventListener("click", () => {
-    const _pf = id => { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? 0 : v; };
-    const _pi = id => { const v = parseInt(document.getElementById(id)?.value);   return isNaN(v) ? 0 : v; };
-
     const bienIdRaw = parseInt(document.getElementById("cf-bien")?.value) || null;
     const tousBiensLocal = [...(D.immobilierBiens||[]), ...(D.investImmo||[])];
     const bienSelectionne = bienIdRaw ? tousBiensLocal.find(b => b.id === bienIdRaw) : null;
     const immobilierBienId = bienSelectionne ? bienSelectionne.id : null;
     const name = bienSelectionne ? bienSelectionne.name : (existingLoan?.name || "Crédit");
 
-    const isContractual = document.getElementById("cf-model-contractual").checked;
-    const hasPrefunding = document.getElementById("cf-cb-prefunding").checked;
-    const hasDeferred   = document.getElementById("cf-cb-deferred").checked;
-    const hasInsChange  = document.getElementById("cf-cb-ins-change").checked;
+    const startDate = document.getElementById("cf-start").value;
+    const bank      = document.getElementById("cf-bank").value;
+    const _pf = id => { const v = parseFloat(document.getElementById(id).value); return isNaN(v) ? 0 : v; };
+    const _pi = id => { const v = parseInt(document.getElementById(id).value);   return isNaN(v) ? 0 : v; };
+    const purchase  = _pf("cf-purchase");
+    const notary    = _pf("cf-notary");
+    const guarantee = _pf("cf-guarantee");
+    const dossier   = _pf("cf-dossier");
+    const apport    = _pf("cf-apport");
+    const loanAmount= _loanAmount;
+    const rate      = _pf("cf-rate");
+    const duration  = _pi("cf-duration");
+    const insurance = _pf("cf-insurance");
 
-    const loanAmount = _loanAmount;
-    const duration   = _pi("cf-duration");
-
-    if (loanAmount <= 0 || duration <= 0) { toast("Veuillez remplir tous les champs obligatoires"); return; }
+    if (loanAmount <= 0 || duration <= 0) {
+      toast("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
 
     const loan = {
       id: isEdit ? existingLoan.id : (D.nextLoanId || Date.now()),
-      name,
-      startDate:         document.getElementById("cf-start").value,
-      bank:              document.getElementById("cf-bank").value,
-      purchasePrice:     _pf("cf-purchase"),
-      notaryFees:        _pf("cf-notary"),
-      guaranteeFees:     _pf("cf-guarantee"),
-      dossierFees:       _pf("cf-dossier"),
-      apport:            _pf("cf-apport"),
-      loanAmount,
-      rate:              _pf("cf-rate"),
-      duration,
-      // Phases optionnelles
-      prefundingMonths:  hasPrefunding ? _pi("cf-prefunding-months") : 0,
-      prefundingFee:     hasPrefunding ? _pf("cf-prefunding-fee")    : 0,
-      deferredMonths:    hasDeferred   ? _pi("cf-deferred-months")   : 0,
-      deferredFee:       hasDeferred   ? _pf("cf-deferred-fee")      : 0,
-      // Assurance
-      initialInsurance:  _pf("cf-initial-insurance"),
-      insuranceRate:     0, // rétrocompat, calculé dynamiquement
-      contractualTotal:  isContractual ? _pf("cf-contractual") : 0,
-      insuranceChangeMo: hasInsChange  ? _pi("cf-insurance-change-month") : null,
-      insuranceRate2:    hasInsChange  ? _pf("cf-insurance-rate2") : 0,
+      name, startDate, bank, purchasePrice: purchase, notaryFees: notary,
+      guaranteeFees: guarantee, dossierFees: dossier, apport,
+      loanAmount, rate, duration, insuranceRate: insurance,
       immobilierBienId,
     };
 
@@ -5883,11 +5449,12 @@ function openCreditForm(existingLoan = null) {
       D.nextLoanId = (D.nextLoanId || Date.now()) + 1;
     }
 
-    saveData(); overlay.remove(); render();
+    saveData();
+    overlay.remove();
+    render();
     toast(isEdit ? "Crédit mis à jour ✓" : "Crédit ajouté ✓");
   });
 }
-
 
 // ── Rendu page Crédits ───────────────────────────────────────────────────────
 
@@ -5939,7 +5506,7 @@ function credits(c) {
       <div style="flex:1;min-width:0">
         <div class="credit-name">${loan.name}</div>
         <div class="credit-meta">
-          ${loan.startDate||""} → ${kpi.endDate} · ${loan.duration} mois amort.${loan.prefundingMonths ? " · Préfi "+loan.prefundingMonths+"m" : ""}${loan.deferredMonths ? " · Différé "+loan.deferredMonths+"m" : ""} · ${loan.rate}%
+          ${loan.startDate||""} → ${kpi.endDate} · ${loan.duration} mois · ${loan.rate}% · Assurance ${loan.insuranceRate}%
         </div>
       </div>`;
 
@@ -5987,7 +5554,7 @@ function credits(c) {
     const kpis = document.createElement("div");
     kpis.className = "credit-kpis";
     const kpiData = [
-      { label:"Mensualité", val:eur(kpi.mensualiteTotal),       cls:"amber" },
+      { label:"Mensualité tout compris", val:eur(kpi.mensualiteTotal),       cls:"amber" },
       { label:"Prix d'achat",            val:eur(loan.purchasePrice),         cls:"" },
       { label:"Montant du crédit",       val:eur(loan.loanAmount),            cls:"" },
       { label:"Coût total intérêts",     val:eur(kpi.totalInteret),           cls:"loss" },
@@ -6009,7 +5576,7 @@ function credits(c) {
     const toggle = document.createElement("div");
     toggle.className = "amort-toggle";
     toggle.innerHTML = `
-      <span>Tableau d'amortissement (${kpi.rows.length} échéances)</span>
+      <span>Tableau d'amortissement (${loan.duration} échéances)</span>
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>`;
 
     const tableWrap = document.createElement("div");
@@ -6023,57 +5590,51 @@ function credits(c) {
 
       if (isOpen && !tableBuilt) {
         tableBuilt = true;
-
-                const { rows } = kpi;
+        const { rows } = kpi;
         const currentRow = kpi.currentRow;
-
-        const hasAssur   = rows.some(r => r.assurance > 0);
-        const hasIntRep  = rows.some(r => (r.interetsCompens||0) > 0);
 
         let tbody = "";
         rows.forEach((r, i) => {
-          const rang = String(i + 1).padStart(4, "0");
-          tbody += `<tr class="${r.isCurrent ? "current-row" : ""} ${r.phase ? "phase-"+r.phase : ""}">
-            <td style="white-space:nowrap;font-family:var(--font-mono)">${rang}${r.isCurrent ? " ◀" : ""}</td>
-            <td>${r.date}</td>
-            <td>${eur(r.total)}</td>
-            <td>${r.capitalAmorti > 0 ? eur(r.capitalAmorti) : "0,00"}</td>
-            <td style="color:var(--loss)">${r.partInteret > 0 ? eur(r.partInteret) : "0,00"}</td>
+          const isCurrent = (i + 1) === currentRow;
+          tbody += `<tr class="${isCurrent ? "current-row" : ""}">
+            <td>${r.date}${isCurrent ? " ◀" : ""}</td>
+            <td>${eur(r.totalEcheance)}</td>
+            <td>${eur(r.capitalAmorti)}</td>
+            <td style="color:var(--loss)">${eur(r.partInteret)}</td>
+            <td>${eur(r.assurance)}</td>
             <td style="color:var(--amber)">${eur(r.capitalRestant)}</td>
-            ${hasAssur  ? `<td>${eur(r.assurance)}</td>` : ""}
-            ${hasIntRep ? `<td>${(r.interetsCompens||0) > 0 ? eur(r.interetsCompens) : "0,00"}</td>` : ""}
+            <td>${eur(r.totalCapitalAmorti)}</td>
           </tr>`;
         });
 
-        const totalMontant  = rows.reduce((s,r) => s + (r.total||0), 0);
-        const totalCapital  = rows.reduce((s,r) => s + (r.capitalAmorti||0), 0);
-        const totalInteret  = rows.reduce((s,r) => s + (r.partInteret||0), 0);
-        const totalAssur    = rows.reduce((s,r) => s + (r.assurance||0), 0);
+        const totalMontant  = rows.reduce((s,r) => s + r.totalEcheance, 0);
+        const totalCapital  = rows.reduce((s,r) => s + r.capitalAmorti, 0);
+        const totalInteret  = rows.reduce((s,r) => s + r.partInteret, 0);
+        const totalAssur    = rows.reduce((s,r) => s + r.assurance, 0);
 
         tableWrap.innerHTML = `
           <table class="amort-table">
             <thead>
               <tr>
-                <th>Rang</th>
-                <th>Date</th>
-                <th>Mensualité</th>
+                <th>Échéance</th>
+                <th>Mensualité totale</th>
                 <th>Capital amorti</th>
-                <th>Part intérêts</th>
+                <th>Intérêts</th>
+                <th>Assurance</th>
                 <th>Capital restant dû</th>
-                ${hasAssur  ? "<th>Assurance</th>" : ""}
-                ${hasIntRep ? "<th>Intérêts reportés</th>" : ""}
+                <th>Capital amorti cumulé</th>
               </tr>
             </thead>
             <tbody>${tbody}</tbody>
             <tfoot>
               <tr>
-                <td colspan="2">Total (${rows.length} échéances)</td>
+                <td>Total</td>
                 <td>${eur(totalMontant)}</td>
                 <td>${eur(totalCapital)}</td>
                 <td style="color:var(--loss)">${eur(totalInteret)}</td>
+                <td>${eur(totalAssur)}</td>
                 <td>—</td>
-                ${hasAssur  ? `<td>${eur(totalAssur)}</td>` : ""}
-                ${hasIntRep ? "<td>—</td>" : ""}
+                <td>${eur(totalCapital)}</td>
               </tr>
             </tfoot>
           </table>`;
@@ -6546,11 +6107,19 @@ function parametres(c) {
     <div class="card-title" style="margin:-20px -20px 20px;border-bottom:1px solid var(--border)">
       💾 Sauvegarde des données
     </div>
-    <div style="margin-bottom:16px;font-size:var(--text-md);color:var(--text);line-height:1.6">
-      La sauvegarde utilise le stockage local de votre navigateur.
-      Vos données sont liées à ce navigateur sur cet ordinateur uniquement.<br><br>
-      Vos données seront perdues si vous videz le cache, ouvrez ce fichier dans un autre navigateur ou utilisez une navigation privée.<br><br>
-      Pour ne jamais perdre vos données, exportez régulièrement une sauvegarde .json ci-dessous.
+    <div class="settings-alert" style="margin-bottom:16px">
+      <div class="settings-alert-title">⚠ Important — À lire avant d'utiliser</div>
+      <div class="settings-alert-body">
+        La sauvegarde utilise le <strong>stockage local de votre navigateur</strong>.
+        Vos données sont liées à <strong>ce navigateur sur cet ordinateur uniquement</strong>.<br><br>
+        <strong>Vos données seront perdues si vous :</strong>
+        <ul>
+          <li>Videz le cache ou l'historique du navigateur</li>
+          <li>Ouvrez ce fichier dans un autre navigateur ou un autre ordinateur</li>
+          <li>Utilisez une navigation privée / incognito</li>
+        </ul><br>
+        👉 <strong>Pour ne jamais perdre vos données</strong>, exportez régulièrement une sauvegarde .json ci-dessous.
+      </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="app-btn app-btn--rect app-btn--primary" id="param-export">
@@ -6777,9 +6346,17 @@ function parametres(c) {
       🌍 Taux de change
     </div>
     <div class="fx-status" id="fx-status" style="margin-bottom:8px">Non chargés</div>
-    <div class="fx-pills" id="fx-pills">—</div>`;
+    <div class="fx-pills" id="fx-pills" style="margin-bottom:14px">—</div>
+    <button class="app-btn app-btn--rect" id="fx-refresh">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right:4px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      Actualiser les taux
+    </button>`;
   c.appendChild(fxCard);
+
+  document.getElementById("fx-refresh").addEventListener("click", fetchFxRates);
   fetchFxRates();
+
+  // ── 4. À propos ──────────────────────────────────────────────────────────
 
 }
 
@@ -6932,8 +6509,8 @@ function avancement(c) {
     const pct      = cible > 0 ? Math.min(100, matelasActuel / cible * 100) : 0;
     const s1ok     = !hsDettes;
     const s2ok     = s1ok && matelasActuel >= cible;
-    const dcaL     = ['dcaETF','dcaActions','dcaCrypto']
-                       .map(k => ({ key:k, label:{dcaETF:'ETF',dcaActions:'Actions',dcaCrypto:'Cryptomonnaies'}[k], val:v[k]||0 }));
+    const dcaL     = ['dcaETF','dcaActions','dcaCrypto','dcaImmo','dcaAlternatif']
+                       .map(k => ({ key:k, label:{dcaETF:'ETF',dcaActions:'Actions',dcaCrypto:'Cryptomonnaies',dcaImmo:'Immobilier',dcaAlternatif:'Alternatif'}[k], val:v[k]||0 }));
     const totPct   = dcaL.reduce((s,l) => s+l.val, 0);
     const totOk    = Math.abs(totPct-100) < 0.5;
 
@@ -7005,7 +6582,7 @@ function avancement(c) {
         const pctEl = card.querySelector('#av-donut-pct');
         if (pctEl) pctEl.style.fontSize = svgFs + 'px';
       });
-      foot.innerHTML = `<span id="av-foot2-label" style="${TIT(tc2)}">Matelas de sécurité</span><span id="av-foot2-val" style="${MONO(valC)}">${locked2?'0 €':eur(matelasActuel)}</span>`;
+      foot.innerHTML = `<span id="av-foot2-label" style="${TIT(tc2)}">Matelas de sécurité</span><span id="av-foot2-val" style="${MONO(valC)}">${locked2?'0 €':eur(cible)}</span>`;
       grid.appendChild(card);
 
       // input : mise à jour texte + couleurs card 2 en temps réel
@@ -7028,7 +6605,7 @@ function avancement(c) {
         el('av-donut-arc').setAttribute('stroke', newCol);
         el('av-donut-pct').textContent = Math.round(newPct)+'%'; el('av-donut-pct').style.fill = newCol;
         el('av-donut-sub').textContent = eur(matelasActuel)+' / '+eur(newC); el('av-donut-sub').style.color = 'var(--text)';
-        el('av-foot2-val').textContent = eur(matelasActuel); el('av-foot2-val').style.color = newS2ok ? 'var(--gain)' : 'var(--amber)';
+        el('av-foot2-val').textContent = eur(newC); el('av-foot2-val').style.color = newS2ok ? 'var(--gain)' : 'var(--amber)';
         el('av-head2-hint').style.color   = newS2ok ? 'var(--gain)' : 'var(--amber)';
         el('av-head2-hint').innerHTML     = newS2ok ? CHECK_ICON+'Validée' : HOURGLASS_ICON+'En cours';
         // Couleurs fond/bordure card 2

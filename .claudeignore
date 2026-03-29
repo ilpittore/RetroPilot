@@ -1,0 +1,16 @@
+# Fichiers binaires lourds (Stop à l'hémorragie de tokens)
+Budget.xlsx
+Architecture.rtf
+*.png
+*.ico
+*.jpg
+*.jpeg
+*.pdf
+
+# Fichiers de configuration système
+.DS_Store
+.git/
+.vscode/
+
+# Fichiers de données volumineux (si Claude n'a pas besoin de les modifier)
+
