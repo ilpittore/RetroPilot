@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build-mac:
     runs-on: macos-latest
@@ -20,9 +23,9 @@ jobs:
         run: npm install
 
       - name: Build .dmg (Mac)
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run build:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload .dmg
         uses: actions/upload-artifact@v4
@@ -44,9 +47,9 @@ jobs:
         run: npm install
 
       - name: Build .exe (Windows)
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload .exe
         uses: actions/upload-artifact@v4
@@ -57,6 +60,8 @@ jobs:
   release:
     needs: [build-mac, build-win]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download Mac build
         uses: actions/download-artifact@v4
@@ -75,4 +80,4 @@ jobs:
         with:
           files: dist/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
