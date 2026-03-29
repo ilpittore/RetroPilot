@@ -1,2 +1,9 @@
 node_modules/
 dist/
+.DS_Store
+package-lock.json
+RetroPilot.json
+Serveur.app
+.claude/
+.claudeignore
+.claudeignore.save
