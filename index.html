@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file:; connect-src 'self' https://open.er-api.com https://api.frankfurter.app https://api.binance.com https://corsproxy.io https://api.allorigins.win https://query1.finance.yahoo.com https://query2.finance.yahoo.com;">
 <title>RetroPilot</title>
+<link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -3229,7 +3230,6 @@ function budget(c) {
       input?.addEventListener("input", e => update(parseFloat(e.target.value)));
       document.getElementById("invest-up")?.addEventListener("click", () => update((parseFloat(input.value)||0) + 10));
       document.getElementById("invest-down")?.addEventListener("click", () => update(Math.max(0, (parseFloat(input.value)||0) - 10)));
-      // Hover sur les boutons
       ["invest-up","invest-down"].forEach(id => {
         const btn = document.getElementById(id);
         if (!btn) return;
