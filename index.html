@@ -205,11 +205,7 @@ nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
 .app-btn--rect { border-radius: 8px; padding: 0 10px; gap: 5px; white-space: nowrap; }
 .app-btn--primary { background: var(--amber); border-color: var(--amber); color: #0f0e0c; }
 .app-btn--primary:hover { opacity: .85; color: #0f0e0c !important; border-color: var(--amber) !important; }
-.app-btn--danger { background: var(--loss); border-color: var(--loss); color: var(--text); }
-.app-btn--danger:hover { opacity: .85; }
-.app-btn--danger-outline { color: var(--loss); border-color: var(--loss)44; }
-.app-btn--danger-outline:hover { background: var(--loss)18; border-color: var(--loss) !important; color: var(--loss) !important; }
-.ml-auto { margin-right: auto; }
+
 
 
 
@@ -279,15 +275,8 @@ nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
 .alloc-vals { color: var(--text3); font-family: var(--font-mono); font-size:var(--text-md); gap: 8px; display: flex; }
 .alloc-bar-bg { height: 6px; background: var(--surface2); border-radius: 4px; overflow: hidden; position: relative; }
 .alloc-bar-reel { height: 100%; border-radius: 4px; background: var(--amber); transition: width .5s; }
-.alloc-bar-cible { position: absolute; top: 0; height: 100%; width: 2px; background: var(--text3); border-radius: 2px; }
 
 /* ── Evolution chart ───────────────────────────────────────────────────── */
-#evo-canvas { width: 100%; height: 180px; }
-.evo-list { display: flex; flex-direction: column; gap: 3px; max-height: 200px; overflow-y: auto; }
-.evo-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 4px; border-radius: 6px; }
-.evo-row:hover { background: var(--surface2); }
-.evo-date { font-family: var(--font-mono); font-size:var(--text-md); color: var(--text3); }
-.evo-val { font-family: var(--font-mono); font-size:var(--text-md); color: var(--text); }
 
 /* ── Tables (base partagée) ────────────────────────────────────────────── */
 .invest-table-wrap, .dep-table-wrap { overflow-x: auto; margin: 0 -20px -20px; }
@@ -588,7 +577,6 @@ tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom:
 .budget-subtotal-row .val { font-family: var(--font-mono); color: var(--text2); }
 
 
-.budget-inline-form.open { display: flex; }
 
 /* ── Patrimoine account rows ────────────────────────────────────────────── */
 .pat-account-row {
@@ -934,7 +922,6 @@ const DEFAULTS = {
     { name: "PEL", bank: "Ex de banque", amount: 0 },
   ],
   enveloppes: { matelas: 0, economies: 0, factures: 0, projets: 0 },
-    immobilierPerso: 0,
   liquiditesInvest: [
     { name: "PEA",        bank: "Ex de banque", amount: 0, currency: "EUR" },
     { name: "PEA-PME",    bank: "Ex de banque",       amount: 0, currency: "EUR" },
@@ -961,11 +948,7 @@ const DEFAULTS = {
     crypto:  [{name:"L1",target:0},{name:"L2",target:0},{name:"DeFi",target:0},{name:"Stablecoin",target:0},{name:"NFT / Gaming",target:0},{name:"Infrastructure",target:0},{name:"Autre",target:0}],
   },
   loans: [],
-  comptes: [],
   nextLoanId: 0,
-  allocationReel:  [0, 0, 0, 0, 0],
-  allocationCible: [0, 0, 0, 0, 0],
-  allocationCats:  ["IMMO","ETF","ACTIONS","CRYPTO","ALTERNATIF"],
   analyseCats: ["Loyer","Courses alimentaires","Autres","Assurances","Santé","Transport","Loisirs","Shopping","Autres"],
 
   livretEnveloppes: [
@@ -978,31 +961,11 @@ const DEFAULTS = {
   analyseDepenses: [],
   evolutionCapital: [],
   virements: {
-    salaireMensuel: 0,
     revenusComplementaires: [],
-    comptesCourants: [
-      { name:"Compte courant 1 (salaire)", bank:"Fortuneo",        actif:true,  montant:0 },
-      { name:"Compte courant 2 (Appart)",  bank:"La Poste",        actif:true,  montant:0 },
-      { name:"Compte courant 3 (PINEL)",   bank:"Caisse d'épargne",actif:true,  montant:0 },
-      { name:"Compte courant 4 (auto)",    bank:"Fortuneo",        actif:true,  montant:0 },
-      { name:"Compte courant 5 (pro)",     bank:"Fortuneo",        actif:false, montant:0 },
-    ],
-    livrets: [
-      { name:"LDDS (matelas)",  bank:"Fortuneo", actif:false, montant:0 },
-      { name:"Livret A (éco.)", bank:"Fortuneo", actif:true,  montant:0 },
-      { name:"Livret A (fact.)",bank:"Fortuneo", actif:true,  montant:0 },
-    ],
-    investissements: [
-      { name:"PEA",          bank:"Trade Republic", actif:true,  montant:0 },
-      { name:"CTO 1",        bank:"Trade Republic", actif:false, montant:0 },
-      { name:"CTO 2",        bank:"IBKR",           actif:true,  montant:0 },
-      { name:"Assurance vie",bank:"Fortuneo",       actif:false, montant:0 },
-      { name:"Binance",      bank:"Binance",        actif:false, montant:0 },
-    ],
     hasDettes: false,
     dettesMontant: 0,
     moisMatelas: 6,
-    dcaETF: 0, dcaActions: 0, dcaCrypto: 0, dcaImmo: 0, dcaAlternatif: 0,
+    dcaETF: 0, dcaActions: 0, dcaCrypto: 0,
   },
   lastUpdated: null,
 };
@@ -1076,7 +1039,6 @@ function migrateData() {
 
   // ── Synchronisation couleurs comptes ────────────────────────────────────
   const getBankColor = name => (D.banks||[]).find(b => b.name === name)?.color || "#888";
-  if (D.comptes) D.comptes.forEach(c => { c.color = getBankColor(c.bank); });
 }
 migrateData();
 saveData(); // Persiste les valeurs par défaut/migrées dès le premier chargement
@@ -1209,7 +1171,7 @@ function computePatrimoine() {
     { label:"Immobilier",     amount:immoTotalFull, color:"#e87830" },
     { label:"Bourse",         amount:bourse,        color:"#c868a8" },
     { label:"Autres",         amount:alternatif,    color:"#9b59b6" },
-  ].filter(c => c.amount > 0).map(c => ({...c, pct: total>0?(c.amount/total*100):0}));
+  ].map(c => ({...c, pct: total>0?(c.amount/total*100):0}));
   return { cash, ccTotal, liInvTotal, livrets, plans, etfMkt, stkMkt, cryMkt, investImmoTotal, alternatif, bourse, invest, immoTotal, immoTotalFull, total, cats };
 }
 
@@ -1524,7 +1486,17 @@ function openCryptoAccountModal(onSaved, editIdx = -1, accountSection = "cryptoA
     if (!name) { toast("L'intitulé du compte est requis"); return; }
     const color = (D.banks||[]).find(b=>b.name===bank)?.color || "#888";
     if (isEdit) {
+      const oldName = D[accountSection][editIdx].name;
       D[accountSection][editIdx] = { ...D[accountSection][editIdx], name, bank: bank||"—", color };
+      if (oldName && oldName !== name) {
+        ["etfPositions","stockPositions","cryptoPositions"].forEach(key => {
+          (D[key]||[]).forEach(p => { if (p.account === oldName) p.account = name; });
+        });
+        const arr = D.virements.arrondis || {};
+        if (oldName in arr) { arr[name] = arr[oldName]; delete arr[oldName]; }
+        const rep = D.virements.investissementsRep || {};
+        if (oldName in rep) { rep[name] = rep[oldName]; delete rep[oldName]; }
+      }
     } else {
       if (!Array.isArray(D[accountSection])) D[accountSection] = [];
       D[accountSection].push({ name, bank: bank||"—", color });
@@ -1628,7 +1600,26 @@ ${isEdit ? "Modifier" : "Ajouter"} — ${title}
     if (isNaN(amt)) { toast("Le montant est requis"); return; }
     if (isEdit) {
       const _sv = (D.banks||[]).find(b=>b.name===bank); const _sc = _sv?_sv.color:"#888";
+      const oldName = D[section][editIdx].name;
       D[section][editIdx] = { ...D[section][editIdx], name, bank: bank||"—", amount: amt, currency, color: _sc };
+      if (oldName && oldName !== name) {
+        // Budget items
+        ["budgetEssentiel","budgetAnnuel","budgetEnviesMensu","budgetEnviesAnnuel"].forEach(key => {
+          (D[key]||[]).forEach(item => { if (item.account === oldName) item.account = name; });
+        });
+        // Positions bourse
+        ["etfPositions","stockPositions","cryptoPositions"].forEach(key => {
+          (D[key]||[]).forEach(p => { if (p.account === oldName) p.account = name; });
+        });
+        // livretAssociations (valeur = nom du livret)
+        const assoc = D.livretAssociations || {};
+        Object.keys(assoc).forEach(k => { if (assoc[k] === oldName) assoc[k] = name; });
+        // virements.arrondis et investissementsRep (clé = nom du compte)
+        const arr = D.virements.arrondis || {};
+        if (oldName in arr) { arr[name] = arr[oldName]; delete arr[oldName]; }
+        const rep = D.virements.investissementsRep || {};
+        if (oldName in rep) { rep[name] = rep[oldName]; delete rep[oldName]; }
+      }
     } else {
       if (!Array.isArray(D[section])) D[section] = [];
       const _sv2 = (D.banks||[]).find(b=>b.name===bank); const _sc2 = _sv2?_sv2.color:"#888";
@@ -1833,7 +1824,6 @@ function drawEvoChart(container) {
 
 function dashboard(c) {
   const P = computePatrimoine();
-  const B = computeBudget();
   const totalDebt = D.loans.reduce((s,l) => s + loanKPIs(l).capitalRestantADate, 0);
   const etfMkt = sum(D.etfPositions,"market"), etfCost = sum(D.etfPositions,"cost");
   const stkMkt = sum(D.stockPositions,"market");
@@ -2042,43 +2032,29 @@ function dashboard(c) {
   });
 
   const allocCard = document.createElement("div"); allocCard.className = "card";
-  allocCard.innerHTML = `<div class="card-title">Allocation investissements</div>`;
+  allocCard.innerHTML = `<div class="card-title">Allocation du patrimoine</div>`;
   const allocRows = document.createElement("div"); allocRows.className = "alloc-rows";
-  D.allocationCats.forEach((cat,i) => {
-    const reel  = D.allocationReel[i];
-    const cible = D.allocationCible[i];
-    const maxW = Math.max(...D.allocationReel, ...D.allocationCible, 1);
+  const allocTotal = P.total;
+  P.cats.forEach(cat => {
+    const pctVal = allocTotal > 0 ? cat.amount / allocTotal * 100 : 0;
+    const isZero = cat.amount <= 0;
     const row = document.createElement("div"); row.className = "alloc-row";
     row.innerHTML = `<div class="alloc-header">
-      <span class="alloc-name">${cat}</span>
-      <div class="alloc-vals"><span>${reel.toFixed(1)}%</span><span>/ cible ${cible}%</span></div>
+      <span class="alloc-name" style="${isZero ? "color:var(--text3)" : ""}">${cat.label}</span>
+      <div class="alloc-vals">
+        <span style="font-family:var(--font-mono);${isZero ? "color:var(--text3)" : ""}">${isZero ? "—" : eur(cat.amount)}</span>
+        <span style="color:var(--text3)">/</span>
+        <span style="color:${isZero ? "var(--text3)" : "var(--text)"}">${isZero ? "—" : pctVal.toFixed(1)+"%"}</span>
+      </div>
     </div>
     <div class="alloc-bar-bg">
-      <div class="alloc-bar-reel" style="width:${reel/maxW*100}%"></div>
-      <div class="alloc-bar-cible" style="left:${cible/maxW*100}%"></div>
+      <div class="alloc-bar-reel" style="width:${pctVal}%;background:${isZero ? "var(--border2)" : cat.color}"></div>
     </div>`;
     allocRows.appendChild(row);
   });
   allocCard.appendChild(allocRows);
   row1.appendChild(allocCard);
   c.appendChild(row1);
-
-  const bRow = document.createElement("div"); bRow.className = "grid-3";
-  const bStats = [
-    { label:"Budget essentiel / mois", value:eur(B.essentiel), sub:"50% — Besoins",                      color:"#e87830" },
-    { label:"Envies / mois",           value:eur(B.envies + B.resteAVivre), sub:"Projets + Reste à vivre", color:"#c868a8" },
-    { label:"Investissement / mois",   value:eur(B.invest),    sub:"20% — Épargne",                       color:"#34c77b" },
-  ];
-  bStats.forEach((s,i) => {
-    const el = document.createElement("div");
-    el.className = "card";
-    el.style.cssText = `background:${s.color}15;border:1px solid ${s.color}45;--card-border:${s.color}45;--card-text:${s.color};border-radius:var(--radius);animation:fadeUp .35s ${(i*0.06+.2)}s ease both`;
-    el.innerHTML = `<div class="card-title" style="color:${s.color}">${s.label}</div>
-      <div class="stat-value" style="margin-top:2px">${s.value}</div>
-      <div class="stat-sub">${s.sub}</div>`;
-    bRow.appendChild(el);
-  });
-  c.appendChild(bRow);
 }
 
 function patrimoine(c) {
@@ -2196,27 +2172,68 @@ function patrimoine(c) {
       row.style.cssText = "display:flex;align-items:center;gap:8px";
 
       const dot = document.createElement("span");
-      dot.style.cssText = `width:9px;height:9px;border-radius:50%;background:${cat.color};flex-shrink:0`;
+      dot.style.cssText = `width:9px;height:9px;border-radius:50%;background:${cat.amount > 0 ? cat.color : "var(--border2)"};flex-shrink:0`;
 
       const label = document.createElement("span");
-      label.style.cssText = "font-size:var(--text-md);color:var(--text);flex:1";
+      label.style.cssText = `font-size:var(--text-md);color:${cat.amount > 0 ? "var(--text)" : "var(--text3)"};flex:1`;
       label.textContent = cat.label;
 
       const pctSpan = document.createElement("span");
       pctSpan.style.cssText = "font-size:var(--text-md);color:var(--text3);font-family:var(--font-mono);width:58px;text-align:right;white-space:nowrap;flex-shrink:0";
-      pctSpan.textContent = cat.pct.toFixed(1) + " %";
+      pctSpan.textContent = cat.amount > 0 ? cat.pct.toFixed(1) + " %" : "—";
 
       const amtSpan = document.createElement("span");
-      amtSpan.style.cssText = "font-family:var(--font-mono);font-size:var(--text-md);color:var(--text);text-align:right;min-width:110px";
-      amtSpan.textContent = eur(cat.amount);
+      amtSpan.style.cssText = `font-family:var(--font-mono);font-size:var(--text-md);color:${cat.amount > 0 ? "var(--text)" : "var(--text3)"};text-align:right;min-width:110px`;
+      amtSpan.textContent = cat.amount > 0 ? eur(cat.amount) : "—";
 
       row.appendChild(dot); row.appendChild(label); row.appendChild(pctSpan); row.appendChild(amtSpan);
       legend.appendChild(row);
     });
     inner.appendChild(legend);
+    container.innerHTML = "";
     container.appendChild(inner);
     leftCol.appendChild(wrapper);
     wrapper.style.marginTop = "0";
+
+    document.addEventListener("datachanged", function onDataChanged() {
+      if (!wrapper.isConnected) { document.removeEventListener("datachanged", onDataChanged); return; }
+      const P2 = computePatrimoine();
+      // Mettre à jour la barre
+      bar.innerHTML = "";
+      const hasVals = P2.cats.some(c => c.amount > 0);
+      if (!hasVals) {
+        const empty = document.createElement("div");
+        empty.style.cssText = "flex:1;background:var(--border2);border-radius:9px";
+        bar.appendChild(empty);
+      } else {
+        P2.cats.forEach(cat => {
+          if (cat.amount <= 0) return;
+          const seg = document.createElement("div");
+          seg.style.cssText = `flex:${cat.pct};background:${cat.color};transition:flex .4s ease;min-width:2px`;
+          seg.title = `${cat.label} : ${eur(cat.amount)} (${cat.pct.toFixed(1)}%)`;
+          bar.appendChild(seg);
+        });
+      }
+      // Mettre à jour la légende
+      legend.innerHTML = "";
+      P2.cats.forEach(cat => {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;gap:8px";
+        const dot = document.createElement("span");
+        dot.style.cssText = `width:9px;height:9px;border-radius:50%;background:${cat.amount > 0 ? cat.color : "var(--border2)"};flex-shrink:0`;
+        const label = document.createElement("span");
+        label.style.cssText = `font-size:var(--text-md);color:${cat.amount > 0 ? "var(--text)" : "var(--text3)"};flex:1`;
+        label.textContent = cat.label;
+        const pctSpan = document.createElement("span");
+        pctSpan.style.cssText = "font-size:var(--text-md);color:var(--text3);font-family:var(--font-mono);width:58px;text-align:right;white-space:nowrap;flex-shrink:0";
+        pctSpan.textContent = cat.amount > 0 ? cat.pct.toFixed(1) + " %" : "—";
+        const amtSpan = document.createElement("span");
+        amtSpan.style.cssText = `font-family:var(--font-mono);font-size:var(--text-md);color:${cat.amount > 0 ? "var(--text)" : "var(--text3)"};text-align:right;min-width:110px`;
+        amtSpan.textContent = cat.amount > 0 ? eur(cat.amount) : "—";
+        row.appendChild(dot); row.appendChild(label); row.appendChild(pctSpan); row.appendChild(amtSpan);
+        legend.appendChild(row);
+      });
+    });
   })();
 
   // ── Liquidités ─────────────────────────────────────────────────────────────
@@ -4638,6 +4655,256 @@ function virements(c) {
 // ═══════════════ investissements.js ═══════════════
 // ─── INVESTISSEMENTS ──────────────────────────────────────────────────────────
 
+function openSellModal(p, section, onSaved) {
+  const allAccounts = [...(D.liquiditesInvest||[]), ...(D.compteCourants||[])];
+  const acc = allAccounts.find(a => a.name === p.account);
+  const accountColor = acc ? ((D.banks||[]).find(b => b.name === acc.bank)?.color || "#888") : "#888";
+
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:#00000088;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px";
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid #f0a02055;border-radius:var(--radius);padding:0;width:100%;max-width:460px;animation:fadeUp .2s ease">
+      <div class="card-title">Vendre — ${p.name}</div>
+      <div style="padding:6px 20px 20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="form-group" style="margin:0;grid-column:1/-1">
+            <label>Compte</label>
+            <div style="font-family:var(--font-mono);font-size:var(--text-md);color:${accountColor};border:1px solid var(--border2);border-radius:var(--radius);padding:0 10px;height:var(--input-h);display:flex;align-items:center">${p.account || "—"}</div>
+          </div>
+          <div class="form-group" style="margin:0;grid-column:1/-1">
+            <label>Quantité disponible</label>
+            <div style="font-family:var(--font-mono);font-size:var(--text-md);color:var(--text);border:1px solid var(--border2);border-radius:var(--radius);padding:0 10px;height:var(--input-h);display:flex;align-items:center">${(p.qty||0).toLocaleString("fr-FR",{maximumFractionDigits:4})}</div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Quantité à vendre</label>
+            <input class="form-input" type="number" id="sell-qty" step="any" min="0" max="${p.qty||0}" placeholder="0" style="font-family:var(--font-mono)">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Prix de vente (€)</label>
+            <input class="form-input" type="number" id="sell-price" step="any" min="0" placeholder="${(p.price||0).toFixed(2)}" style="font-family:var(--font-mono)" value="${p.price||""}">
+          </div>
+          <div class="form-group" style="margin:0;grid-column:1/-1">
+            <label>Frais (€)</label>
+            <input class="form-input" type="number" id="sell-fees" step="any" min="0" placeholder="0" value="0" style="font-family:var(--font-mono)">
+          </div>
+        </div>
+        <div style="margin-bottom:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">Produit net</span>
+            <span id="sell-net" style="font-family:var(--font-mono);color:var(--text)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">P&L réalisé</span>
+            <span id="sell-pnl" style="font-family:var(--font-mono);color:var(--text)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">Liquidité après vente</span>
+            <span id="sell-after" style="font-family:var(--font-mono);font-weight:600;color:var(--text)">—</span>
+          </div>
+        </div>
+        <div class="form-actions" style="padding:0">
+          <button class="app-btn app-btn--rect" id="sell-cancel">Annuler</button>
+          <button class="app-btn app-btn--rect app-btn--primary" id="sell-confirm" disabled style="opacity:.4;cursor:not-allowed">Valider la vente</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+  overlay.addEventListener("keydown", e => { if (e.key === "Escape") overlay.remove(); });
+  document.getElementById("sell-cancel").addEventListener("click", () => overlay.remove());
+
+  const qtyEl     = document.getElementById("sell-qty");
+  const priceEl   = document.getElementById("sell-price");
+  const feesEl    = document.getElementById("sell-fees");
+  const netEl     = document.getElementById("sell-net");
+  const pnlEl     = document.getElementById("sell-pnl");
+  const afterEl   = document.getElementById("sell-after");
+  const confirmBtn = document.getElementById("sell-confirm");
+
+  const update = () => {
+    const qty   = parseFloat(qtyEl.value)   || 0;
+    const price = parseFloat(priceEl.value) || 0;
+    const fees  = parseFloat(feesEl.value)  || 0;
+    const net   = qty * price - fees;
+    const pruEur = (p.pruCurrency && p.pruCurrency !== "EUR") ? (p.pru||0) * (fxRates[p.pruCurrency]||1) : (p.pru||0);
+    const pnl   = qty * price - qty * pruEur - fees;
+    const liq   = acc ? (acc.amount || 0) : 0;
+    const after = liq + net;
+    const ok    = qty > 0 && price > 0 && qty <= (p.qty || 0);
+
+    netEl.textContent   = qty > 0 && price > 0 ? eur(net)  : "—";
+    pnlEl.textContent   = qty > 0 && price > 0 ? eur(pnl)  : "—";
+    pnlEl.style.color   = pnl >= 0 ? "var(--gain)" : "var(--loss)";
+    afterEl.textContent = qty > 0 && price > 0 ? eur(after) : "—";
+    afterEl.style.color = "var(--text)";
+
+    confirmBtn.disabled      = !ok;
+    confirmBtn.style.opacity = ok ? "1" : ".4";
+    confirmBtn.style.cursor  = ok ? "pointer" : "not-allowed";
+  };
+
+  qtyEl.addEventListener("input", update);
+  priceEl.addEventListener("input", update);
+  feesEl.addEventListener("input", update);
+  setTimeout(() => qtyEl.focus(), 50);
+
+  document.getElementById("sell-confirm").addEventListener("click", () => {
+    const qty   = parseFloat(qtyEl.value)   || 0;
+    const price = parseFloat(priceEl.value) || 0;
+    const fees  = parseFloat(feesEl.value)  || 0;
+    const net   = qty * price - fees;
+    const pruEur = (p.pruCurrency && p.pruCurrency !== "EUR") ? (p.pru||0) * (fxRates[p.pruCurrency]||1) : (p.pru||0);
+    const pnl   = Math.round((qty * price - qty * pruEur - fees) * 100) / 100;
+
+    // Mise à jour position
+    p.qty = Math.round(((p.qty || 0) - qty) * 1e8) / 1e8;
+    p.cost   = p.qty * pruEur;
+    p.market = p.qty * (p.price || price);
+    p.pnl    = p.market - p.cost;
+    p.perf   = p.cost > 0 ? (p.market / p.cost - 1) * 100 : 0;
+
+    // Créditer le compte
+    if (acc) acc.amount = Math.round((acc.amount + net) * 100) / 100;
+
+    saveData();
+    overlay.remove();
+    if (onSaved) onSaved();
+    const sign = pnl >= 0 ? "+" : "";
+    toast(`Vente enregistrée ✓  —  P&L : ${sign}${eur(pnl)}`);
+  });
+}
+
+function openBuyModal(p, section, onSaved) {
+  // Trouver le compte associé dans liquiditesInvest ou compteCourants
+  const allAccounts = [...(D.liquiditesInvest||[]), ...(D.compteCourants||[])];
+  const acc = allAccounts.find(a => a.name === p.account);
+
+  const getLiquidite = () => acc ? (acc.amount || 0) : 0;
+
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:#00000088;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px";
+
+  const accountColor = acc ? ((D.banks||[]).find(b => b.name === acc.bank)?.color || "#888") : "#888";
+
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid #f0a02055;border-radius:var(--radius);padding:0;width:100%;max-width:460px;animation:fadeUp .2s ease">
+      <div class="card-title">Acheter — ${p.name}</div>
+      <div style="padding:6px 20px 20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="form-group" style="margin:0;grid-column:1/-1">
+            <label>Compte</label>
+            <div style="font-family:var(--font-mono);font-size:var(--text-md);color:${accountColor};border:1px solid var(--border2);border-radius:var(--radius);padding:0 10px;height:var(--input-h);display:flex;align-items:center">${p.account || "—"}</div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Quantité</label>
+            <input class="form-input" type="number" id="buy-qty" step="any" min="0" placeholder="0" style="font-family:var(--font-mono)">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Prix d'achat (€)</label>
+            <input class="form-input" type="number" id="buy-price" step="any" min="0" placeholder="${(p.price||0).toFixed(2)}" style="font-family:var(--font-mono)" value="${p.price||""}">
+          </div>
+          <div class="form-group" style="margin:0;grid-column:1/-1">
+            <label>Frais (€)</label>
+            <input class="form-input" type="number" id="buy-fees" step="any" min="0" placeholder="0" value="0" style="font-family:var(--font-mono)">
+          </div>
+        </div>
+        <div style="margin-bottom:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">Coût total</span>
+            <span id="buy-total" style="font-family:var(--font-mono);color:var(--text)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">Nouveau PRU</span>
+            <span id="buy-pru" style="font-family:var(--font-mono);color:var(--text)">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">Liquidité disponible</span>
+            <span id="buy-liq" style="font-family:var(--font-mono);color:var(--text)">${eur(getLiquidite())}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-md)">
+            <span style="color:var(--text2)">Après achat</span>
+            <span id="buy-after" style="font-family:var(--font-mono);font-weight:600;color:var(--text)">—</span>
+          </div>
+        </div>
+        <div class="form-actions" style="padding:0">
+          <button class="app-btn app-btn--rect" id="buy-cancel">Annuler</button>
+          <button class="app-btn app-btn--rect app-btn--primary" id="buy-confirm" disabled style="opacity:.4;cursor:not-allowed">Valider l'achat</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+  overlay.addEventListener("keydown", e => { if (e.key === "Escape") overlay.remove(); });
+  document.getElementById("buy-cancel").addEventListener("click", () => overlay.remove());
+
+  const qtyEl   = document.getElementById("buy-qty");
+  const priceEl = document.getElementById("buy-price");
+  const feesEl  = document.getElementById("buy-fees");
+  const totalEl = document.getElementById("buy-total");
+  const pruEl   = document.getElementById("buy-pru");
+  const afterEl = document.getElementById("buy-after");
+  const confirmBtn = document.getElementById("buy-confirm");
+
+  const update = () => {
+    const qty   = parseFloat(qtyEl.value)   || 0;
+    const price = parseFloat(priceEl.value) || 0;
+    const fees  = parseFloat(feesEl.value)  || 0;
+    const total = qty * price + fees;
+    const liq   = getLiquidite();
+    const after = liq - total;
+    const ok    = qty > 0 && price > 0 && total <= liq;
+
+    const oldQty = p.qty || 0;
+    const oldPru = (p.pruCurrency && p.pruCurrency !== "EUR") ? (p.pru || 0) * (fxRates[p.pruCurrency] || 1) : (p.pru || 0);
+    const newPru = qty > 0 && price > 0 ? (oldQty + qty > 0 ? (oldPru * oldQty + price * qty) / (oldQty + qty) : price) : null;
+
+    totalEl.textContent = qty > 0 && price > 0 ? eur(total) : "—";
+    pruEl.textContent   = newPru !== null ? eur(newPru) : "—";
+    afterEl.textContent = qty > 0 && price > 0 ? eur(after) : "—";
+    afterEl.style.color = after >= 0 ? "var(--gain)" : "var(--loss)";
+
+    confirmBtn.disabled = !ok;
+    confirmBtn.style.opacity = ok ? "1" : ".4";
+    confirmBtn.style.cursor  = ok ? "pointer" : "not-allowed";
+  };
+
+  qtyEl.addEventListener("input", update);
+  priceEl.addEventListener("input", update);
+  feesEl.addEventListener("input", update);
+  setTimeout(() => qtyEl.focus(), 50);
+
+  document.getElementById("buy-confirm").addEventListener("click", () => {
+    const qty   = parseFloat(qtyEl.value)   || 0;
+    const price = parseFloat(priceEl.value) || 0;
+    const fees  = parseFloat(feesEl.value)  || 0;
+    const total = qty * price + fees;
+
+    // PRU pondéré (en EUR)
+    const oldQty  = p.qty  || 0;
+    const oldPru  = (p.pruCurrency && p.pruCurrency !== "EUR") ? (p.pru || 0) * (fxRates[p.pruCurrency] || 1) : (p.pru || 0);
+    const newPru  = oldQty + qty > 0 ? (oldPru * oldQty + price * qty) / (oldQty + qty) : price;
+
+    // Mise à jour position
+    p.qty = oldQty + qty;
+    p.pru = newPru;
+    p.pruCurrency = "EUR";
+    p.cost   = p.qty * newPru;
+    p.market = p.qty * (p.price || price);
+    p.pnl    = p.market - p.cost;
+    p.perf   = p.cost > 0 ? (p.market / p.cost - 1) * 100 : 0;
+
+    // Déduire du compte
+    if (acc) acc.amount = Math.round((acc.amount - total) * 100) / 100;
+
+    saveData();
+    overlay.remove();
+    if (onSaved) onSaved();
+    toast("Achat enregistré ✓");
+  });
+}
+
 function investissements(c) {
   const etfMkt  = sum(D.etfPositions,"market"),  etfPnl  = sum(D.etfPositions,"pnl"),  etfCost  = sum(D.etfPositions,"cost");
   const stkMkt  = sum(D.stockPositions,"market"), stkPnl  = sum(D.stockPositions,"pnl"), stkCost  = sum(D.stockPositions,"cost");
@@ -4890,7 +5157,6 @@ function investissements(c) {
       const p = (D[sec]||[])[idx];
       if (!p) return;
       const cell = (attr) => tr.querySelector(`[data-live="${attr}"]`);
-      if (cell("price"))  cell("price").textContent = eur(p.price||0);
       if (cell("market")) cell("market").textContent = eur(p.market);
       if (cell("pnl")) {
         cell("pnl").textContent = eur(p.pnl);
@@ -4900,16 +5166,10 @@ function investissements(c) {
         cell("perf").innerHTML = `<span class="pnl-badge ${p.perf>=0?'up':'down'}">${pct(p.perf)}</span>`;
       }
       if (cell("weight")) cell("weight").textContent = p.weight.toFixed(1)+"%";
-      // Badge ticker error
-      const nameTd = tr.cells[1];
-      const existingBadge = nameTd?.querySelector("span[style*='#e05050']");
-      if (p._tickerError && !existingBadge && nameTd) {
-        const badge = document.createElement("span");
-        badge.style.cssText = "background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;font-size:var(--text-md);padding:1px 5px;font-family:var(--font-body)";
-        badge.textContent = "⚠ ticker";
-        nameTd.appendChild(badge);
-      } else if (!p._tickerError && existingBadge) {
-        existingBadge.remove();
+      // ⚠ dans la colonne prix si erreur fetch
+      const priceTd = cell("price");
+      if (priceTd) {
+        priceTd.innerHTML = (p._tickerError ? '<span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;font-size:var(--text-md);padding:1px 4px;margin-right:3px;font-family:var(--font-body)">⚠</span>' : "") + eur(p.price||0);
       }
     });
 
@@ -5257,7 +5517,7 @@ function investissements(c) {
     table.innerHTML = `<thead><tr>
       <th>Compte</th><th>Nom</th>
       <th>Catégorie</th><th>Obj.</th><th style="white-space:nowrap">Inv. auto</th><th>Qté</th><th>PRU</th><th>Prix</th>
-      <th style="white-space:nowrap">Valeur mkt</th><th>P&L</th><th>Perf.</th><th>Poids</th><th></th>
+      <th style="white-space:nowrap">Valeur mkt</th><th>P&L</th><th>Perf.</th><th>Poids</th><th></th><th></th>
     </tr></thead>`;
     const tbody = document.createElement("tbody");
     livePositions.forEach((p, pi) => {
@@ -5266,8 +5526,8 @@ function investissements(c) {
       tr.dataset.idx = pi;
       tr.innerHTML = `
         <td><span style="${accountPill(p.account)}">${p.account||"—"}</span></td>
-        <td>${p.name} <span style="color:var(--text3)">${p.ticker}</span>${p._tickerError ? ` <span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;padding:1px 5px;font-family:var(--font-body)">⚠ ticker</span>` : ""}</td>
-        <td><span style="font-size:var(--text-md);color:var(--text3);border:1px solid var(--border2);border-radius:20px;padding:1px 8px;white-space:nowrap">${p.category||"—"}</span></td>
+        <td style="white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis">${p.name}</td>
+        <td><span style="font-size:var(--text-md);color:var(--text);border:1px solid var(--border2);border-radius:20px;padding:1px 8px;white-space:nowrap">${p.category||"—"}</span></td>
         <td style="color:var(--text2);font-family:var(--font-mono)">${p.target != null && p.target !== "" ? p.target+"%" : "—"}</td>
         <td style="font-family:var(--font-mono);white-space:nowrap">${(() => {
           if (!p.autoInvest) return '<span style="color:var(--text3)">—</span>';
@@ -5282,11 +5542,41 @@ function investissements(c) {
         })()}</td>
         <td>${(p.qty||0).toLocaleString("fr-FR",{maximumFractionDigits:4})}</td>
         <td>${eur((p.pruCurrency && p.pruCurrency !== "EUR") ? p.pru * (fxRates[p.pruCurrency]||1) : p.pru||0)}</td>
-        <td data-live="price">${eur(p.price||0)}</td>
+        <td data-live="price">${p._tickerError ? '<span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;font-size:var(--text-md);padding:1px 4px;margin-right:3px;font-family:var(--font-body)">⚠</span>' : ""}${eur(p.price||0)}</td>
         <td data-live="market" style="white-space:nowrap">${eur(p.market)}</td>
         <td data-live="pnl" class="${p.pnl>=0?'text-gain':'text-loss'}">${eur(p.pnl)}</td>
         <td data-live="perf"><span class="pnl-badge ${p.perf>=0?'up':'down'}">${pct(p.perf)}</span></td>
         <td data-live="weight">${p.weight.toFixed(1)}%</td>`;
+      // Bouton achat
+      const buyTd = document.createElement("td");
+      const buyBtn = document.createElement("button"); buyBtn.className = "edit-btn"; buyBtn.title = "Acheter / Vendre";
+      buyBtn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`;
+      buyBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        document.querySelectorAll(".trade-menu").forEach(el => el.remove());
+        const menu = document.createElement("div");
+        menu.className = "trade-menu";
+        menu.style.cssText = "position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px;min-width:140px;box-shadow:0 4px 16px #0005;display:flex;flex-direction:column;gap:2px";
+        const mkItem = (label, icon, color, onClick) => {
+          const btn = document.createElement("button");
+          btn.style.cssText = `display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;border:none;background:transparent;cursor:pointer;width:100%;text-align:left;font-size:var(--text-md);color:${color};font-family:var(--font-body);transition:background .1s`;
+          btn.innerHTML = `${icon}<span>${label}</span>`;
+          btn.addEventListener("mouseenter", () => btn.style.background = "var(--surface2)");
+          btn.addEventListener("mouseleave", () => btn.style.background = "transparent");
+          btn.addEventListener("click", () => { menu.remove(); onClick(); });
+          return btn;
+        };
+        menu.appendChild(mkItem("Acheter", `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`, "var(--gain)", () => openBuyModal(p, section, () => { renderTable(activeTab); document.dispatchEvent(new Event("datachanged")); })));
+        menu.appendChild(mkItem("Vendre", `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`, "var(--loss)", () => openSellModal(p, section, () => { renderTable(activeTab); document.dispatchEvent(new Event("datachanged")); })));
+        const rect = buyBtn.getBoundingClientRect();
+        menu.style.top  = (rect.bottom + 4) + "px";
+        menu.style.left = (rect.left - 80) + "px";
+        document.body.appendChild(menu);
+        const close = e => { if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener("click", close, true); } };
+        setTimeout(() => document.addEventListener("click", close, true), 0);
+      });
+      buyTd.appendChild(buyBtn);
+      tr.appendChild(buyTd);
       // Bouton édition
       const editTd = document.createElement("td");
       const editBtn = document.createElement("button"); editBtn.className = "edit-btn"; editBtn.title = "Modifier";
@@ -5306,7 +5596,7 @@ function investissements(c) {
       <td data-live="total-pnl" class="${totals.pnl>=0?'text-gain':'text-loss'}" style="text-align:right">${eur(totals.pnl)}</td>
       <td style="text-align:right"><span data-live="total-perf" class="pnl-badge ${totals.perf>=0?'up':'down'}">${pct(totals.perf)}</span></td>
       <td style="text-align:right">100%</td>
-      <td></td>
+      <td></td><td></td>
     </tr>`;
     table.appendChild(tbody); table.appendChild(tfoot);
     body.appendChild(table);
