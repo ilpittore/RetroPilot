@@ -1782,7 +1782,10 @@ function drawEvoChart(container) {
   const minV = Math.min(...vals) * 0.98;
   const maxV = Math.max(...vals) * 1.02;
 
-  const xScale = (i) => PAD.left + (i / (pts.length-1)) * w;
+  const parseDate = s => { const [d,m,y] = s.split('/').map(Number); return new Date(y,m-1,d).getTime(); };
+  const times = pts.map(p => parseDate(p.date));
+  const tMin = times[0], tMax = times[times.length-1];
+  const xScale = (i) => tMax === tMin ? PAD.left + w/2 : PAD.left + ((times[i]-tMin)/(tMax-tMin)) * w;
   const yScale = (v) => PAD.top + h - ((v-minV)/(maxV-minV)) * h;
 
   const pathD = pts.map((p,i) => `${i===0?"M":"L"}${xScale(i).toFixed(1)},${yScale(p.patrimoine).toFixed(1)}`).join(" ");
@@ -1797,12 +1800,31 @@ function drawEvoChart(container) {
     <line x1="${PAD.left}" y1="${y}" x2="${PAD.left+w}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
   }
 
+  // Axe X : graduations régulières indépendantes des points
   let xLabels = "";
-  const step = Math.max(1, Math.floor(pts.length/5));
-  pts.forEach((p,i) => {
-    if (i % step !== 0 && i !== pts.length-1) return;
-    xLabels += `<text x="${xScale(i)}" y="${H-6}" text-anchor="middle" fill="var(--text3)" font-size="10" font-family="DM Mono,monospace">${p.date.slice(3)}</text>`;
-  });
+  const msDay = 86400000;
+  const totalDays = (tMax - tMin) / msDay;
+  // Choisir un intervalle rond selon l'étendue
+  let intervalDays;
+  if (totalDays <= 90)       intervalDays = 14;
+  else if (totalDays <= 365) intervalDays = 30;
+  else if (totalDays <= 730) intervalDays = 90;
+  else if (totalDays <= 1825) intervalDays = 180;
+  else                        intervalDays = 365;
+
+  // Premier tick : début du premier intervalle rond après tMin
+  const intervalMs = intervalDays * msDay;
+  const firstTick = Math.ceil(tMin / intervalMs) * intervalMs;
+  for (let t = firstTick; t <= tMax + msDay; t += intervalMs) {
+    if (t < tMin || t > tMax) continue;
+    const x = PAD.left + ((t - tMin) / (tMax - tMin)) * w;
+    const d = new Date(t);
+    const label = intervalDays >= 365
+      ? d.getFullYear()
+      : String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+    xLabels += `<line x1="${x}" y1="${PAD.top}" x2="${x}" y2="${PAD.top+h+4}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>`;
+    xLabels += `<text x="${x}" y="${H-6}" text-anchor="middle" fill="var(--text3)" font-size="10" font-family="DM Mono,monospace">${label}</text>`;
+  }
 
   const dots = pts.map((p,i) => `<circle cx="${xScale(i)}" cy="${yScale(p.patrimoine)}" r="4" fill="var(--amber)" stroke="var(--bg2)" stroke-width="2"/>`).join("");
 
@@ -1856,6 +1878,14 @@ function dashboard(c) {
       </div>
       <div class="stat-value" style="margin-top:2px">${s.value}</div>
       ${trendHtml}`;
+    if (s.label === "Bourse") {
+      const refreshDashBtn = document.createElement("button");
+      refreshDashBtn.className = "app-btn app-btn--round";
+      refreshDashBtn.title = "Rafraîchir les prix";
+      refreshDashBtn.innerHTML = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
+      refreshDashBtn.addEventListener("click", () => { if (window.refreshPrices) window.refreshPrices(false, refreshDashBtn); });
+      el.querySelector(".card-title").appendChild(refreshDashBtn);
+    }
     sg.appendChild(el);
   });
   c.appendChild(sg);
@@ -1921,8 +1951,8 @@ function dashboard(c) {
       const dateInput = overlay.querySelector('#evo-input-date').value;
       const valInput  = parseFloat(overlay.querySelector('#evo-input-val').value) || 0;
       if (!dateInput || valInput <= 0) { toast('Date et montant obligatoires'); return; }
-      const d = new Date(dateInput);
-      const dateStr = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+      const [yy, mm, dd] = dateInput.split('-').map(Number);
+      const dateStr = String(dd).padStart(2,'0') + '/' + String(mm).padStart(2,'0') + '/' + yy;
       if (!D.evolutionCapital) D.evolutionCapital = [];
       const idx = D.evolutionCapital.findIndex(p => p.date === dateStr);
       if (idx >= 0) {
@@ -4905,6 +4935,118 @@ function openBuyModal(p, section, onSaved) {
   });
 }
 
+// ── Prix bourse — fonctions globales ────────────────────────────────────────
+let _bourseRefreshBtn = null; // initialisé par investissements()
+
+async function fetchYahooPrice(ticker) {
+  const proxies = [
+    `https://corsproxy.io/?url=https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`)}`,
+  ];
+  for (const url of proxies) {
+    try {
+      const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+      if (!r.ok) continue;
+      const j = await r.json();
+      const meta = j?.chart?.result?.[0]?.meta;
+      const price = meta?.regularMarketPrice;
+      if (price == null || isNaN(price)) continue;
+      const europeanSuffixes = ['.PA','.F','.AS','.MI','.MC','.BR','.LS','.ST','.HE','.CO','.OL','.VX','.SW'];
+      const isEuropean = europeanSuffixes.some(s => ticker.toUpperCase().endsWith(s.toUpperCase()));
+      const currency = (meta?.currency || "EUR").toUpperCase();
+      if (currency === "EUR" || isEuropean) return price;
+      const rate = fxRates[currency];
+      return rate ? price * rate : price;
+    } catch { continue; }
+  }
+  return null;
+}
+
+async function fetchBinancePrice(symbol) {
+  try {
+    const sym = symbol.toUpperCase().replace("/","").replace("-","");
+    const url = `https://api.binance.com/api/v3/ticker/price?symbol=${sym}`;
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!j?.price) return null;
+    const priceUSD = parseFloat(j.price);
+    const usdToEur = fxRates["USD"] || 1;
+    return priceUSD * usdToEur;
+  } catch { return null; }
+}
+
+async function refreshPrices(silent = false, triggerBtn = null) {
+  const _animBtns = [
+    ...(_bourseRefreshBtn ? [_bourseRefreshBtn] : []),
+    ...(triggerBtn && triggerBtn !== _bourseRefreshBtn ? [triggerBtn] : [])
+  ];
+  if (!silent) {
+    _animBtns.forEach(b => { b.style.setProperty("--card-border", "var(--amber)"); b.style.setProperty("--card-text", "var(--amber)"); b.style.opacity = "0.6"; });
+  }
+  let updated = 0, failed = 0;
+
+  const recalc = (pos) => {
+    pos.market = pos.qty * pos.price;
+    const pruEur = (pos.pruCurrency && pos.pruCurrency !== "EUR") ? pos.pru * (fxRates[pos.pruCurrency] || 1) : pos.pru;
+    pos.cost   = pos.qty * pruEur;
+    pos.pnl    = pos.market - pos.cost;
+    pos.perf   = pos.cost > 0 ? (pos.market / pos.cost - 1) * 100 : 0;
+  };
+
+  const recalcWeights = (arr) => {
+    const tot = arr.reduce((s,p) => s + (p.market||0), 0);
+    arr.forEach(p => { p.weight = tot > 0 ? p.market/tot*100 : 0; });
+  };
+
+  for (const sec of ["etfPositions","stockPositions"]) {
+    for (const pos of (D[sec]||[])) {
+      if (!pos.ticker) continue;
+      const price = await fetchYahooPrice(pos.ticker);
+      if (price != null) { pos.price = price; pos._tickerError = false; recalc(pos); updated++; }
+      else { pos._tickerError = true; failed++; }
+    }
+    recalcWeights(D[sec]||[]);
+  }
+
+  for (const pos of (D.cryptoPositions||[])) {
+    if (!pos.ticker) continue;
+    const sym = pos.ticker.toUpperCase().endsWith("USDT") ? pos.ticker.toUpperCase() : pos.ticker.toUpperCase()+"USDT";
+    const price = await fetchBinancePrice(sym);
+    if (price != null) { pos.price = price; pos._tickerError = false; recalc(pos); updated++; }
+    else { pos._tickerError = true; failed++; }
+  }
+  recalcWeights(D.cryptoPositions||[]);
+
+  saveData();
+
+  document.querySelectorAll("tr[data-section][data-idx]").forEach(tr => {
+    const sec = tr.dataset.section;
+    const idx = parseInt(tr.dataset.idx);
+    const p = (D[sec]||[])[idx];
+    if (!p) return;
+    const cell = (attr) => tr.querySelector(`[data-live="${attr}"]`);
+    if (cell("market")) cell("market").textContent = eur(p.market);
+    if (cell("pnl")) { cell("pnl").textContent = eur(p.pnl); cell("pnl").className = p.pnl >= 0 ? "text-gain" : "text-loss"; }
+    if (cell("perf")) { cell("perf").innerHTML = `<span class="pnl-badge ${p.perf>=0?'up':'down'}">${pct(p.perf)}</span>`; }
+    if (cell("weight")) cell("weight").textContent = p.weight.toFixed(1)+"%";
+    const priceTd = cell("price");
+    if (priceTd) {
+      priceTd.innerHTML = (p._tickerError ? '<span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;font-size:var(--text-md);padding:1px 4px;margin-right:3px;font-family:var(--font-body)">⚠</span>' : "") + eur(p.price||0);
+    }
+  });
+
+  document.dispatchEvent(new Event("datachanged"));
+  if (!silent) {
+    _animBtns.forEach(b => { b.style.removeProperty("--card-border"); b.style.removeProperty("--card-text"); b.style.opacity = "1"; });
+    if (updated === 0 && failed === 0) {
+      toast("Aucun actif à mettre à jour");
+    } else {
+      toast(`Prix mis à jour : ${updated} actif${updated>1?"s":""} ✓${failed>0?` — ${failed} échec${failed>1?"s":""}`:""}`, failed > 0 ? 4000 : 2000);
+    }
+  }
+}
+
 function investissements(c) {
   const etfMkt  = sum(D.etfPositions,"market"),  etfPnl  = sum(D.etfPositions,"pnl"),  etfCost  = sum(D.etfPositions,"cost");
   const stkMkt  = sum(D.stockPositions,"market"), stkPnl  = sum(D.stockPositions,"pnl"), stkCost  = sum(D.stockPositions,"cost");
@@ -5066,142 +5208,8 @@ function investissements(c) {
     setTimeout(() => newInput.focus(), 50);
   }
 
-  // ── Récupération des prix ───────────────────────────────────────────────────
-  async function fetchYahooPrice(ticker) {
-    const proxies = [
-      `https://corsproxy.io/?url=https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`)}`,
-    ];
-    for (const url of proxies) {
-      try {
-        const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
-        if (!r.ok) continue;
-        const j = await r.json();
-        const meta = j?.chart?.result?.[0]?.meta;
-        const price = meta?.regularMarketPrice;
-        if (price == null || isNaN(price)) continue;
-        // Suffixes de places européennes → prix en EUR, pas de conversion
-        const europeanSuffixes = ['.PA','.F','.AS','.MI','.MC','.BR','.LS','.ST','.HE','.CO','.OL','.VX','.SW'];
-        const isEuropean = europeanSuffixes.some(s => ticker.toUpperCase().endsWith(s.toUpperCase()));
-        const currency = (meta?.currency || "EUR").toUpperCase();
-        if (currency === "EUR" || isEuropean) return price;
-        const rate = fxRates[currency];
-        return rate ? price * rate : price;
-      } catch { continue; }
-    }
-    return null;
-  }
-
-  async function fetchBinancePrice(symbol) {
-    try {
-      const sym = symbol.toUpperCase().replace("/","").replace("-","");
-      const url = `https://api.binance.com/api/v3/ticker/price?symbol=${sym}`;
-      const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
-      if (!r.ok) return null;
-      const j = await r.json();
-      if (!j?.price) return null;
-      const priceUSD = parseFloat(j.price);
-      // Convertir USD → EUR via fxRates
-      const usdToEur = fxRates["USD"] || 1;
-      return priceUSD * usdToEur;
-    } catch { return null; }
-  }
-
-  async function refreshPrices(silent = false) {
-    if (!silent) {
-      refreshBtn.style.setProperty("--card-border", "var(--amber)"); refreshBtn.style.setProperty("--card-text", "var(--amber)");
-      refreshBtn.style.opacity = "0.6";
-    }
-    let updated = 0, failed = 0;
-
-    const recalc = (pos) => {
-      pos.market = pos.qty * pos.price;
-      const pruEur = (pos.pruCurrency && pos.pruCurrency !== "EUR") ? pos.pru * (fxRates[pos.pruCurrency] || 1) : pos.pru;
-      pos.cost   = pos.qty * pruEur;
-      pos.pnl    = pos.market - pos.cost;
-      pos.perf   = pos.cost > 0 ? (pos.market / pos.cost - 1) * 100 : 0;
-    };
-
-    const recalcWeights = (arr) => {
-      const tot = arr.reduce((s,p) => s + (p.market||0), 0);
-      arr.forEach(p => { p.weight = tot > 0 ? p.market/tot*100 : 0; });
-    };
-
-    // ETF + Actions via Yahoo Finance
-    for (const sec of ["etfPositions","stockPositions"]) {
-      for (const pos of (D[sec]||[])) {
-        if (!pos.ticker) continue;
-        const price = await fetchYahooPrice(pos.ticker);
-        if (price != null) { pos.price = price; pos._tickerError = false; recalc(pos); updated++; }
-        else { pos._tickerError = true; failed++; }
-      }
-      recalcWeights(D[sec]||[]);
-    }
-
-    // Crypto via Binance
-    for (const pos of (D.cryptoPositions||[])) {
-      if (!pos.ticker) continue;
-      const sym = pos.ticker.toUpperCase().endsWith("USDT") ? pos.ticker.toUpperCase() : pos.ticker.toUpperCase()+"USDT";
-      const price = await fetchBinancePrice(sym);
-      if (price != null) { pos.price = price; pos._tickerError = false; recalc(pos); updated++; }
-      else { pos._tickerError = true; failed++; }
-    }
-    recalcWeights(D.cryptoPositions||[]);
-
-    saveData();
-
-    // Mise à jour en place des cellules — sans reconstruire le tableau
-    document.querySelectorAll("tr[data-section][data-idx]").forEach(tr => {
-      const sec = tr.dataset.section;
-      const idx = parseInt(tr.dataset.idx);
-      const p = (D[sec]||[])[idx];
-      if (!p) return;
-      const cell = (attr) => tr.querySelector(`[data-live="${attr}"]`);
-      if (cell("market")) cell("market").textContent = eur(p.market);
-      if (cell("pnl")) {
-        cell("pnl").textContent = eur(p.pnl);
-        cell("pnl").className = p.pnl >= 0 ? "text-gain" : "text-loss";
-      }
-      if (cell("perf")) {
-        cell("perf").innerHTML = `<span class="pnl-badge ${p.perf>=0?'up':'down'}">${pct(p.perf)}</span>`;
-      }
-      if (cell("weight")) cell("weight").textContent = p.weight.toFixed(1)+"%";
-      // ⚠ dans la colonne prix si erreur fetch
-      const priceTd = cell("price");
-      if (priceTd) {
-        priceTd.innerHTML = (p._tickerError ? '<span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;font-size:var(--text-md);padding:1px 4px;margin-right:3px;font-family:var(--font-body)">⚠</span>' : "") + eur(p.price||0);
-      }
-    });
-
-    // Mettre à jour le tfoot du tableau actif
-    const activeSec = tabDefs[activeTab].section;
-    const lp = D[activeSec]||[];
-    const liveMkt = sum(lp,"market"), livePnl = sum(lp,"pnl"), liveCost = sum(lp,"cost");
-    const livePerf = liveCost > 0 ? (liveMkt/liveCost-1)*100 : 0;
-    const tm = body.querySelector("[data-live='total-market']");
-    const tp = body.querySelector("[data-live='total-pnl']");
-    const tperf = body.querySelector("[data-live='total-perf']");
-    if (tm) tm.textContent = eur(liveMkt);
-    if (tp) { tp.textContent = eur(livePnl); tp.className = (livePnl>=0?"text-gain":"text-loss"); tp.style.textAlign = "right"; }
-    if (tperf) { tperf.textContent = pct(livePerf); tperf.className = `pnl-badge ${livePerf>=0?"up":"down"}`; }
-
-    updateKPIs();
-    document.dispatchEvent(new Event("datachanged"));
-    if (!silent) {
-      refreshBtn.style.removeProperty("--card-border"); refreshBtn.style.removeProperty("--card-text");
-      refreshBtn.style.opacity = "1";
-      if (updated === 0 && failed === 0) {
-        toast("Aucun actif à mettre à jour");
-      } else {
-        toast(`Prix mis à jour : ${updated} actif${updated>1?"s":""} ✓${failed>0?` — ${failed} échec${failed>1?"s":""}`:""}`, failed > 0 ? 4000 : 2000);
-      }
-    }
-  }
-
+  _bourseRefreshBtn = refreshBtn;
   refreshBtn.addEventListener("click", () => refreshPrices(false));
-
-  // Rafraîchir automatiquement au chargement
-  setTimeout(() => refreshPrices(true), 300);
 
   function openPositionModal(existingPos, existingSection, onSaved) {
     document.getElementById("pos-modal-overlay")?.remove();
@@ -7416,6 +7424,7 @@ navigate(currentPage);
 // Taux de change au démarrage — re-render Patrimoine si déjà affiché
 fetchFxRates().then(() => {
   if (currentPage === "patrimoine") render();
+  refreshPrices(false);
 });
 
 if (D.lastUpdated) {

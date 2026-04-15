@@ -7,3 +7,5 @@ Serveur.app
 .claude/
 .claudeignore
 .claudeignore.save
+*.app
+Old/
