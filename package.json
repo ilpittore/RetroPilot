@@ -1,6 +1,6 @@
 {
   "name": "retropilot",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "RetroPilot — Dashboard finances personnelles",
   "main": "main.js",
   "scripts": {
@@ -16,6 +16,7 @@
   "build": {
     "appId": "com.retropilot.app",
     "productName": "RetroPilot",
+    "publish": null,
     "files": [
       "index.html",
       "main.js",
