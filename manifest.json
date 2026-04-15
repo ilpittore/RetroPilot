@@ -1,0 +1,15 @@
+{
+  "name": "RetroPilot",
+  "short_name": "RetroPilot",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0e0c",
+  "theme_color": "#f0a020",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
