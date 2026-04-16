@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file:; connect-src 'self' https://open.er-api.com https://api.frankfurter.app https://api.binance.com https://corsproxy.io https://api.allorigins.win https://query1.finance.yahoo.com https://query2.finance.yahoo.com https://retropilot-proxy.fpittorino.workers.dev;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: file:; connect-src 'self' https://open.er-api.com https://api.frankfurter.app https://api.binance.com https://retropilot-proxy.fpittorino.workers.dev https://hosycryncqrvugjmupsk.supabase.co https://cdn.jsdelivr.net;">
 <title>RetroPilot</title>
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -878,6 +879,10 @@ tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom:
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       Paramètres
     </div>
+    <div class="nav-item" data-page="compte">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Compte
+    </div>
     <div class="sidebar-footer" id="sidebar-footer">Dernière MAJ : —</div>
   </aside>
   <div id="sidebar-overlay"></div>
@@ -973,26 +978,34 @@ const DEFAULTS = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// STORAGE
+// SUPABASE
 // ═══════════════════════════════════════════════════════════════
 
-const STORAGE_KEY = "RetroPilot";
+const SUPABASE_URL = "https://hosycryncqrvugjmupsk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Iw6Pxnc1QvGDHqsL-nTybQ_SNjKnMrJ";
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return JSON.parse(JSON.stringify(DEFAULTS));
+let _session = null; // { user }
+
+// ── Storage ───────────────────────────────────────────────────
+async function loadDataFromSupabase() {
+  const { data, error } = await _sb.from("user_data").select("data").eq("user_id", _session.user.id).single();
+  if (error || !data?.data || typeof data.data !== "object" || Array.isArray(data.data)) return JSON.parse(JSON.stringify(DEFAULTS));
+  return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), data.data);
 }
 
-function saveData() {
+async function saveData() {
+  if (!_session) return;
   D.lastUpdated = new Date().toLocaleDateString("fr-FR", { day:"2-digit", month:"short", year:"numeric" });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(D));
   const el = document.getElementById("sidebar-footer");
   if (el) el.textContent = "Dernière MAJ : " + D.lastUpdated;
+  try {
+    await _sb.from("user_data").update({ data: D }).eq("user_id", _session.user.id);
+  } catch(e) { console.error("Sauvegarde échouée", e); }
   document.dispatchEvent(new CustomEvent("datachanged"));
 }
+
+function loadData() { return JSON.parse(JSON.stringify(DEFAULTS)); }
 
 let D = loadData();
 
@@ -1043,7 +1056,7 @@ function migrateData() {
   const getBankColor = name => (D.banks||[]).find(b => b.name === name)?.color || "#888";
 }
 migrateData();
-saveData(); // Persiste les valeurs par défaut/migrées dès le premier chargement
+// saveData() appelé après login uniquement
 
 // ═══════════════ utils.js ═══════════════
 // ═══════════════════════════════════════════════════════════════
@@ -1061,6 +1074,7 @@ const PAGES = {
   credits:         { title:"Crédits" },
   analyse:         { title:"Analyse des dépenses" },
   parametres:      { title:"Paramètres" },
+  compte:          { title:"Mon compte" },
 };
 
 let currentPage = localStorage.getItem("pat_page") || "dashboard";
@@ -1085,7 +1099,7 @@ function navigate(page) {
 
 const eur = (n) => new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(n);
 const pct = (n) => (n>=0?"+":"")+n.toFixed(2)+"%";
-const sum = (arr, key) => arr.reduce((s,x) => s + (x[key]||0), 0);
+const sum = (arr, key) => (arr||[]).reduce((s,x) => s + (x[key]||0), 0);
 
 // ═══════════════════════════════════════════════════════════════
 // COMPUTED
@@ -4942,7 +4956,6 @@ let _bourseRefreshBtn = null; // initialisé par investissements()
 async function fetchYahooPrice(ticker) {
   const proxies = [
     `https://retropilot-proxy.fpittorino.workers.dev/?url=https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`)}`,
   ];
   for (const url of proxies) {
     try {
@@ -6941,8 +6954,8 @@ function parametres(c) {
   });
 
   document.getElementById("param-reset").addEventListener("click", () => {
-    confirmModal("Êtes-vous sûr de vouloir supprimer ?", "Cette action supprimera toutes vos données et rechargera les valeurs par défaut.", () => {
-      localStorage.removeItem(STORAGE_KEY);
+    confirmModal("Êtes-vous sûr de vouloir supprimer ?", "Cette action supprimera toutes vos données et rechargera les valeurs par défaut.", async () => {
+      await _sb.from("user_data").update({ data: null }).eq("user_id", _session.user.id);
       location.reload();
     });
   });
@@ -7404,9 +7417,122 @@ function avancement(c) {
 function render() {
   const c = document.getElementById("content");
   c.innerHTML = "";
-  const pages = { dashboard, patrimoine, budget, livret, avancement, virements, investissements, credits, analyse, parametres };
+  const pages = { dashboard, patrimoine, budget, livret, avancement, virements, investissements, credits, analyse, parametres, compte };
   if (pages[currentPage]) pages[currentPage](c);
   if (D.lastUpdated) document.getElementById("sidebar-footer").textContent = "Dernière MAJ : " + D.lastUpdated;
+}
+
+// ─── COMPTE ───────────────────────────────────────────────────────────────────
+
+function compte(c) {
+  const email = _session?.user?.email || "—";
+
+  // Card infos
+  const infoCard = document.createElement("div"); infoCard.className = "card";
+  infoCard.innerHTML = `
+    <div class="card-title" style="margin:-20px -20px 20px;border-bottom:1px solid var(--border)">
+      👤 Mon compte
+    </div>
+    <div style="font-size:var(--text-md);color:var(--text);margin-bottom:6px">Connecté en tant que</div>
+    <div style="font-family:var(--font-mono);color:var(--amber);margin-bottom:20px">${email}</div>
+    <button class="app-btn app-btn--rect" id="compte-logout" style="color:var(--loss);border-color:var(--loss)45">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:6px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Se déconnecter
+    </button>`;
+  c.appendChild(infoCard);
+
+  // Card changer mot de passe
+  const passCard = document.createElement("div"); passCard.className = "card";
+  passCard.innerHTML = `
+    <div class="card-title" style="margin:-20px -20px 20px;border-bottom:1px solid var(--border)">
+      🔑 Changer le mot de passe
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:360px">
+      <div class="form-group">
+        <label>Nouveau mot de passe</label>
+        <input class="form-input" type="password" id="new-pass" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Confirmer</label>
+        <input class="form-input" type="password" id="new-pass-confirm" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div id="pass-error" style="display:none;color:var(--loss);font-size:var(--text-md)"></div>
+      <button class="app-btn app-btn--rect app-btn--primary" id="compte-change-pass" style="align-self:flex-start">Enregistrer</button>
+    </div>`;
+  c.appendChild(passCard);
+
+  // Card changer email
+  const emailCard = document.createElement("div"); emailCard.className = "card";
+  emailCard.innerHTML = `
+    <div class="card-title" style="margin:-20px -20px 20px;border-bottom:1px solid var(--border)">
+      ✉️ Changer l'email
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:360px">
+      <div class="form-group">
+        <label>Nouvel email</label>
+        <input class="form-input" type="email" id="new-email" placeholder="nouveau@email.com">
+      </div>
+      <div id="email-error" style="display:none;color:var(--loss);font-size:var(--text-md)"></div>
+      <button class="app-btn app-btn--rect app-btn--primary" id="compte-change-email" style="align-self:flex-start">Enregistrer</button>
+    </div>`;
+  c.appendChild(emailCard);
+
+  // Card supprimer compte
+  const delCard = document.createElement("div"); delCard.className = "card";
+  delCard.innerHTML = `
+    <div class="card-title" style="margin:-20px -20px 20px;border-bottom:1px solid var(--border)">
+      ⚠️ Zone dangereuse
+    </div>
+    <div style="font-size:var(--text-md);color:var(--text);margin-bottom:14px">La suppression du compte est irréversible. Toutes vos données seront perdues.</div>
+    <button class="app-btn app-btn--rect" id="compte-delete" style="color:var(--loss);border-color:var(--loss)45">Supprimer mon compte</button>`;
+  c.appendChild(delCard);
+
+  // Déconnexion
+  document.getElementById("compte-logout").addEventListener("click", async () => {
+    await _sb.auth.signOut();
+    _session = null;
+    D = loadData();
+    showLoginScreen();
+  });
+
+  // Changer mot de passe
+  document.getElementById("compte-change-pass").addEventListener("click", async () => {
+    const p1 = document.getElementById("new-pass").value;
+    const p2 = document.getElementById("new-pass-confirm").value;
+    const errEl = document.getElementById("pass-error");
+    if (!p1 || p1.length < 6) { errEl.textContent = "Minimum 6 caractères"; errEl.style.display = "block"; return; }
+    if (p1 !== p2) { errEl.textContent = "Les mots de passe ne correspondent pas"; errEl.style.display = "block"; return; }
+    errEl.style.display = "none";
+    const { error } = await _sb.auth.updateUser({ password: p1 });
+    if (error) { errEl.textContent = error.message; errEl.style.display = "block"; return; }
+    toast("Mot de passe modifié ✓");
+    document.getElementById("new-pass").value = "";
+    document.getElementById("new-pass-confirm").value = "";
+  });
+
+  // Changer email
+  document.getElementById("compte-change-email").addEventListener("click", async () => {
+    const em = document.getElementById("new-email").value.trim();
+    const errEl = document.getElementById("email-error");
+    if (!em) { errEl.textContent = "Email requis"; errEl.style.display = "block"; return; }
+    errEl.style.display = "none";
+    const { error } = await _sb.auth.updateUser({ email: em });
+    if (error) { errEl.textContent = error.message; errEl.style.display = "block"; return; }
+    toast("Un email de confirmation a été envoyé ✓");
+    document.getElementById("new-email").value = "";
+  });
+
+  // Supprimer compte
+  document.getElementById("compte-delete").addEventListener("click", () => {
+    confirmModal("Supprimer votre compte ?", "Toutes vos données seront supprimées définitivement.", async () => {
+      await _sb.from("user_data").delete().eq("user_id", _session.user.id);
+      await _sb.auth.signOut();
+      _session = null;
+      D = loadData();
+      showLoginScreen();
+      toast("Compte supprimé");
+    });
+  });
 }
 
 // Navigation par clic sur la sidebar
@@ -7414,23 +7540,161 @@ document.querySelectorAll(".nav-item[data-page]").forEach(el => {
   el.addEventListener("click", () => navigate(el.dataset.page));
 });
 
-// ── Init ──────────────────────────────────────────────────────────────────
-// Restore thème sauvegardé
+// ── Écran de login ────────────────────────────────────────────
+function showLoginScreen(mode = "login") {
+  document.getElementById("app").style.display = "none";
+  const existing = document.getElementById("login-screen");
+  if (existing) existing.remove();
+
+  const screen = document.createElement("div");
+  screen.id = "login-screen";
+  screen.style.cssText = "position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999;overflow-y:auto";
+  document.body.appendChild(screen);
+
+  const card = document.createElement("div");
+  card.style.cssText = "background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:380px;animation:fadeUp .3s ease;margin:auto";
+  screen.appendChild(card);
+
+  const header = document.createElement("div");
+  header.style.cssText = "padding:28px 28px 20px;text-align:center;border-bottom:1px solid var(--border)";
+  header.innerHTML = `
+    <div style="width:48px;height:48px;background:var(--amber);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">
+      <img src="logo.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px">
+    </div>
+    <div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px">RetroPilot</div>
+    <div style="font-size:var(--text-md);color:var(--text3)">${mode === "login" ? "Connectez-vous pour accéder à vos données" : "Créez votre compte"}</div>`;
+  card.appendChild(header);
+
+  const body = document.createElement("div");
+  body.style.cssText = "padding:24px 28px 28px;display:flex;flex-direction:column;gap:14px";
+  card.appendChild(body);
+
+  if (mode === "login") {
+    body.innerHTML = `
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-input" type="email" id="login-email" placeholder="vous@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="login-error" style="display:none;background:var(--loss)15;border:1px solid var(--loss)45;border-radius:8px;padding:8px 12px;font-size:var(--text-md);color:var(--loss)"></div>
+      <button class="app-btn app-btn--rect app-btn--primary" id="login-btn" style="height:38px;font-size:13px">Se connecter</button>
+      <div style="text-align:center;border-top:1px solid var(--border);padding-top:14px">
+        <span style="font-size:var(--text-md);color:var(--text3)">Pas encore de compte ? </span>
+        <button style="background:none;border:none;color:var(--amber);font-size:var(--text-md);cursor:pointer;font-weight:600;padding:0" id="login-show-register">Créer un compte</button>
+      </div>`;
+
+    const emailEl = body.querySelector("#login-email");
+    const passEl  = body.querySelector("#login-password");
+    const errEl   = body.querySelector("#login-error");
+    const btn     = body.querySelector("#login-btn");
+
+    const doLogin = async () => {
+      const email    = emailEl.value.trim();
+      const password = passEl.value;
+      if (!email || !password) { errEl.textContent = "Email et mot de passe requis"; errEl.style.display = "block"; return; }
+      btn.disabled = true; btn.textContent = "Connexion…"; errEl.style.display = "none";
+      try {
+        const { data: authData, error: authErr } = await _sb.auth.signInWithPassword({ email, password });
+        if (authErr) throw new Error(authErr.message);
+        _session = { user: authData.user };
+        const { data: row } = await _sb.from("user_data").select("user_id").eq("user_id", authData.user.id).single();
+        if (!row) await _sb.from("user_data").insert({ user_id: authData.user.id, data: {} });
+        D = await loadDataFromSupabase();
+        migrateData();
+        screen.remove();
+        document.getElementById("app").style.display = "flex";
+        navigate(localStorage.getItem("pat_page") || "dashboard");
+        fetchFxRates().then(() => { if (currentPage === "patrimoine") render(); refreshPrices(false); });
+      } catch(e) {
+        errEl.textContent = e.message === "Invalid login credentials" ? "Email ou mot de passe incorrect" : e.message;
+        errEl.style.display = "block";
+        btn.disabled = false; btn.textContent = "Se connecter";
+      }
+    };
+
+    btn.addEventListener("click", doLogin);
+    passEl.addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+    body.querySelector("#login-show-register").addEventListener("click", () => showLoginScreen("register"));
+    setTimeout(() => emailEl.focus(), 100);
+
+  } else {
+    body.innerHTML = `
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-input" type="email" id="reg-email" placeholder="vous@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input class="form-input" type="password" id="reg-password" placeholder="Minimum 6 caractères" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Confirmer le mot de passe</label>
+        <input class="form-input" type="password" id="reg-password2" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div id="reg-error" style="display:none;background:var(--loss)15;border:1px solid var(--loss)45;border-radius:8px;padding:8px 12px;font-size:var(--text-md);color:var(--loss)"></div>
+      <button class="app-btn app-btn--rect app-btn--primary" id="reg-btn" style="height:38px;font-size:13px">Créer mon compte</button>
+      <div style="text-align:center;border-top:1px solid var(--border);padding-top:14px">
+        <span style="font-size:var(--text-md);color:var(--text3)">Déjà un compte ? </span>
+        <button style="background:none;border:none;color:var(--amber);font-size:var(--text-md);cursor:pointer;font-weight:600;padding:0" id="reg-back">Se connecter</button>
+      </div>`;
+
+    const errEl = body.querySelector("#reg-error");
+    const btn   = body.querySelector("#reg-btn");
+
+    btn.addEventListener("click", async () => {
+      const email = body.querySelector("#reg-email").value.trim();
+      const pass  = body.querySelector("#reg-password").value;
+      const pass2 = body.querySelector("#reg-password2").value;
+      if (!email || !pass) { errEl.textContent = "Email et mot de passe requis"; errEl.style.display = "block"; return; }
+      if (pass.length < 6) { errEl.textContent = "Minimum 6 caractères"; errEl.style.display = "block"; return; }
+      if (pass !== pass2) { errEl.textContent = "Les mots de passe ne correspondent pas"; errEl.style.display = "block"; return; }
+      errEl.style.display = "none";
+      btn.disabled = true; btn.textContent = "Création…";
+      const { data: authData, error: authErr } = await _sb.auth.signUp({ email, password: pass });
+      if (authErr) {
+        errEl.textContent = authErr.message; errEl.style.display = "block";
+        btn.disabled = false; btn.textContent = "Créer mon compte"; return;
+      }
+      await _sb.from("user_data").insert({ user_id: authData.user.id, data: {} });
+      _session = { user: authData.user };
+      D = JSON.parse(JSON.stringify(DEFAULTS));
+      migrateData();
+      screen.remove();
+      document.getElementById("app").style.display = "flex";
+      navigate("dashboard");
+      fetchFxRates().then(() => refreshPrices(false));
+      toast("Compte créé ✓ Bienvenue !");
+    });
+
+    body.querySelector("#reg-back").addEventListener("click", () => showLoginScreen("login"));
+    setTimeout(() => body.querySelector("#reg-email").focus(), 100);
+  }
+}
+
+// ── Démarrage ─────────────────────────────────────────────────
 (function() {
   const t = localStorage.getItem("retropilot_theme") || "dark";
   document.documentElement.setAttribute("data-theme", t);
 })();
-navigate(currentPage);
 
-// Taux de change au démarrage — re-render Patrimoine si déjà affiché
-fetchFxRates().then(() => {
-  if (currentPage === "patrimoine") render();
-  refreshPrices(false);
-});
+// Restaurer la session Supabase si elle existe
+(async function() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) {
+    _session = { user: session.user };
+    D = await loadDataFromSupabase();
+    migrateData();
+    document.getElementById("app").style.display = "flex";
+    navigate(localStorage.getItem("pat_page") || "dashboard");
+    fetchFxRates().then(() => { if (currentPage === "patrimoine") render(); refreshPrices(false); });
+  } else {
+    showLoginScreen();
+  }
+})();
 
-if (D.lastUpdated) {
-  document.getElementById("sidebar-footer").textContent = "Dernière MAJ : " + D.lastUpdated;
-}
 window.addEventListener("resize", () => {
   if (currentPage === "dashboard") render();
 });
