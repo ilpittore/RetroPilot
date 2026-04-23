@@ -6673,6 +6673,124 @@ function parametres(c) {
     updateThemeLabels(newTheme === "light");
   });
 
+  // ── Card Analyser avec une IA ─────────────────────────────────────────────
+  const aiCard = document.createElement("div"); aiCard.className = "card";
+  aiCard.innerHTML = `
+    <div class="card-title" style="margin:-20px -20px 20px;border-bottom:1px solid var(--border)">
+      🤖 Analyser avec une IA
+    </div>
+    <div style="margin-bottom:16px;font-size:var(--text-md);color:var(--text);line-height:1.6">
+      Génère un rapport complet de ton portefeuille (ETF, Actions, Crypto) avec toutes les données chiffrées,
+      puis colle-le dans Claude.ai ou n'importe quelle IA pour obtenir une analyse, des conseils de stratégie, ou discuter de sorties de positions.
+    </div>
+    <button class="app-btn app-btn--rect app-btn--primary" id="param-ai-copy">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:5px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Copier le rapport dans le presse-papier
+    </button>
+  `;
+  c.appendChild(aiCard);
+
+  document.getElementById("param-ai-copy").addEventListener("click", () => {
+    const fmt = (n, dec = 2) => n.toLocaleString("fr-FR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    const pct2 = n => (n >= 0 ? "+" : "") + fmt(n, 2) + "%";
+    const eur2 = n => fmt(n, 2) + " €";
+
+    const sumF = (arr, key) => (arr || []).reduce((s, p) => s + (p[key] || 0), 0);
+
+    const etf   = D.etfPositions    || [];
+    const stk   = D.stockPositions  || [];
+    const cry   = D.cryptoPositions || [];
+
+    const etfMkt  = sumF(etf, "market"),  etfCost  = sumF(etf, "cost"),  etfPnl  = sumF(etf, "pnl");
+    const stkMkt  = sumF(stk, "market"),  stkCost  = sumF(stk, "cost"),  stkPnl  = sumF(stk, "pnl");
+    const cryMkt  = sumF(cry, "market"),  cryCost  = sumF(cry, "cost"),  cryPnl  = sumF(cry, "pnl");
+    const totMkt  = etfMkt + stkMkt + cryMkt;
+    const totCost = etfCost + stkCost + cryCost;
+    const totPnl  = etfPnl + stkPnl + cryPnl;
+    const totPerf = totCost > 0 ? (totMkt / totCost - 1) * 100 : 0;
+
+    const posLine = (p) => {
+      const pruEur = (p.pruCurrency && p.pruCurrency !== "EUR") ? p.pru * (fxRates[p.pruCurrency] || 1) : (p.pru || 0);
+      const parts = [
+        `  - ${p.name}${p.ticker ? " (" + p.ticker + ")" : ""}`,
+        `Compte: ${p.account || "—"}`,
+        `Catégorie: ${p.category || "—"}`,
+        `Qté: ${p.qty || 0}`,
+        `PRU: ${eur2(pruEur)}`,
+        `Prix actuel: ${eur2(p.price || 0)}`,
+        `Valeur: ${eur2(p.market || 0)}`,
+        `P&L: ${eur2(p.pnl || 0)} (${pct2(p.perf || 0)})`,
+        `Poids: ${fmt(p.weight || 0, 1)}%`,
+      ];
+      if (p.target != null && p.target !== "") parts.push(`Objectif: ${p.target}%`);
+      if (p.autoInvest) parts.push("DCA: oui");
+      return parts.join(" | ");
+    };
+
+    const lines = [];
+    lines.push("===== RAPPORT PORTEFEUILLE RETROPILOT =====");
+    lines.push(`Date: ${new Date().toLocaleDateString("fr-FR")}`);
+    lines.push("");
+    lines.push("── SYNTHÈSE ─────────────────────────────────");
+    lines.push(`Valeur totale    : ${eur2(totMkt)}`);
+    lines.push(`Coût total       : ${eur2(totCost)}`);
+    lines.push(`P&L global       : ${eur2(totPnl)} (${pct2(totPerf)})`);
+    lines.push(`Budget DCA/mois  : ${eur2(D.budgetInvestissement || 0)}`);
+    lines.push(`Répartition DCA  : ETF ${D.virements?.dcaETF || 0}% | Actions ${D.virements?.dcaActions || 0}% | Crypto ${D.virements?.dcaCrypto || 0}%`);
+    lines.push("");
+
+    lines.push("── ETF ──────────────────────────────────────");
+    lines.push(`Total: ${eur2(etfMkt)} | Coût: ${eur2(etfCost)} | P&L: ${eur2(etfPnl)} (${pct2(etfCost > 0 ? (etfMkt/etfCost-1)*100 : 0)})`);
+    etf.forEach(p => { if ((p.qty || 0) > 0) lines.push(posLine(p)); });
+    lines.push("");
+
+    lines.push("── ACTIONS ──────────────────────────────────");
+    lines.push(`Total: ${eur2(stkMkt)} | Coût: ${eur2(stkCost)} | P&L: ${eur2(stkPnl)} (${pct2(stkCost > 0 ? (stkMkt/stkCost-1)*100 : 0)})`);
+    stk.forEach(p => { if ((p.qty || 0) > 0) lines.push(posLine(p)); });
+    const stkEmpty = stk.filter(p => (p.qty || 0) === 0);
+    if (stkEmpty.length) lines.push(`  Positions vides (objectif défini, 0 investi): ${stkEmpty.map(p => p.name + " obj " + p.target + "%").join(", ")}`);
+    lines.push("");
+
+    lines.push("── CRYPTO ───────────────────────────────────");
+    lines.push(`Total: ${eur2(cryMkt)} | Coût: ${eur2(cryCost)} | P&L: ${eur2(cryPnl)} (${pct2(cryCost > 0 ? (cryMkt/cryCost-1)*100 : 0)})`);
+    cry.forEach(p => { if ((p.qty || 0) > 0) lines.push(posLine(p)); });
+    lines.push("");
+
+    lines.push("── CONSIGNES DE FORMAT ──────────────────────");
+    lines.push("- Réponds en français");
+    lines.push("- Structure ta réponse en sections numérotées, une par question");
+    lines.push("- Pour chaque action/position analysée, indique clairement un verdict : ✅ entrer / ⏳ attendre / 🔴 réduire / 💎 conserver, suivi d'une justification courte");
+    lines.push("- Sois direct et concis, pas de blabla inutile");
+    lines.push("- Génère un camembert (artifact HTML/SVG) pour la répartition RÉELLE du portefeuille par classe d'actif (ETF / Actions / Crypto) et par zone géographique");
+    lines.push("- Génère un second camembert (artifact HTML/SVG) pour la répartition THÉORIQUE basée sur les % objectifs définis dans le rapport");
+    lines.push("- Termine par un résumé en 5 bullet points max avec les actions prioritaires concrètes");
+    lines.push("");
+    lines.push("── QUESTIONS ────────────────────────────────");
+    lines.push("1. Analyse les positions en dessous de leur objectif de poids : est-il judicieux d'entrer maintenant ? (analyse technique + fondamentale)");
+    lines.push("2. Analyse les positions bien au-dessus de leur objectif : est-il judicieux de vendre une partie ? (analyse technique + fondamentale)");
+    lines.push("3. Étudie la répartition théorique du portefeuille (les % objectifs) : que penses-tu de la diversification ? Y a-t-il un risque de surconcentration sectorielle ou géographique ?");
+    lines.push("4. Analyse la crypto séparément : les PRU sont élevés, quelle stratégie adopter (DCA, hold, sortie partielle) ?");
+    lines.push("5. Le budget DCA de " + eur2(D.budgetInvestissement || 0) + "/mois est-il cohérent avec les objectifs ? Permet-il d'atteindre les cibles dans un délai raisonnable ?");
+    lines.push("6. Quels sont les risques macro et sectoriels du portefeuille ? (exposition géographique, risque géopolitique, dépendance à un secteur...)");
+    lines.push("7. Y a-t-il des doublons ou redondances dans le portefeuille ? (ex: deux ETF similaires, chevauchements actions/ETF...)");
+    lines.push("8. Y a-t-il d'autres observations, alertes ou idées que tu suggères ?");
+    lines.push("═════════════════════════════════════════════");
+
+    const rapport = lines.join("\n");
+    navigator.clipboard.writeText(rapport).then(() => {
+      toast("Rapport copié dans le presse-papier ✓");
+    }).catch(() => {
+      const ta = document.createElement("textarea");
+      ta.value = rapport;
+      ta.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      toast("Rapport copié dans le presse-papier ✓");
+    });
+  });
+
   c.appendChild(saveCard);
 
   document.getElementById("param-export").addEventListener("click", () => {
