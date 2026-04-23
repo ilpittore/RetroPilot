@@ -5397,6 +5397,7 @@ function investissements(c) {
     });
     const tfoot = document.createElement("tfoot");
     tfoot.innerHTML = `<tr>
+      <td></td>
       <td colspan="3" style="text-align:left;letter-spacing:.05em;text-transform:uppercase;color:var(--amber)">Total</td>
       <td style="text-align:right;font-family:var(--font-mono);color:var(--text2)">${totalTarget > 0 ? totalTarget.toFixed(1)+"%" : "—"}</td>
       <td style="text-align:right;font-family:var(--font-mono);color:var(--amber)">${totalAutoInvest > 0 ? eur(totalAutoInvest) : "—"}</td>
