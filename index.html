@@ -5289,7 +5289,7 @@ function investissements(c) {
     const table = document.createElement("table");
     table.className = "invest-table";
     table.innerHTML = `<thead><tr>
-      <th>Compte</th><th>Nom</th>
+      <th></th><th>Compte</th><th>Nom</th>
       <th>Catégorie</th><th>Obj.</th><th style="white-space:nowrap">Inv. auto</th><th>Qté</th><th>PRU</th><th>Prix</th>
       <th style="white-space:nowrap">Valeur mkt</th><th>P&L</th><th>Perf.</th><th>Poids</th><th></th><th></th>
     </tr></thead>`;
@@ -5298,29 +5298,64 @@ function investissements(c) {
       const tr = document.createElement("tr");
       tr.dataset.section = section;
       tr.dataset.idx = pi;
-      tr.innerHTML = `
+      // Flèches réorganisation
+      const arrowTd = document.createElement("td");
+      arrowTd.style.cssText = "padding:0 2px;vertical-align:middle";
+      const arrowWrap = document.createElement("div");
+      arrowWrap.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:1px";
+      const mkArrow = (label, disabled, onClick) => {
+        const btn = document.createElement("button");
+        btn.className = "edit-btn";
+        btn.title = label;
+        btn.disabled = disabled;
+        btn.style.opacity = disabled ? "0.2" : "1";
+        btn.innerHTML = label === "↑"
+          ? `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>`
+          : `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>`;
+        btn.addEventListener("click", e => { e.stopPropagation(); onClick(); });
+        return btn;
+      };
+      const realIdx = D[section].indexOf(p);
+      arrowWrap.appendChild(mkArrow("↑", realIdx === 0, () => {
+        if (realIdx <= 0) return;
+        const arr = D[section];
+        [arr[realIdx - 1], arr[realIdx]] = [arr[realIdx], arr[realIdx - 1]];
+        saveData(); renderTable(activeTab);
+      }));
+      arrowWrap.appendChild(mkArrow("↓", realIdx === D[section].length - 1, () => {
+        const arr = D[section];
+        if (realIdx >= arr.length - 1) return;
+        [arr[realIdx], arr[realIdx + 1]] = [arr[realIdx + 1], arr[realIdx]];
+        saveData(); renderTable(activeTab);
+      }));
+      arrowTd.appendChild(arrowWrap);
+      // Cellules statiques insérées AVANT appendChild pour ne pas écraser les listeners
+      const secToDca = { etfPositions:'dcaETF', stockPositions:'dcaActions', cryptoPositions:'dcaCrypto' };
+      const dcaKey = secToDca[section];
+      const dcaPct = dcaKey ? (D.virements[dcaKey] || 0) : 0;
+      const budget = D.budgetInvestissement || 0;
+      const autoInvestHtml = (() => {
+        if (!p.autoInvest) return '<span style="color:var(--text3)">—</span>';
+        const t = p.target;
+        if (!t || !dcaPct) return '<span style="color:var(--amber)">⚠ —</span>';
+        const montant = Math.round(budget * (dcaPct/100) * (t/100) * 100) / 100;
+        return '<span style="color:var(--amber)">' + eur(montant) + '</span>';
+      })();
+      arrowTd.style.cssText = "white-space:nowrap;padding:0 4px;vertical-align:middle";
+      tr.appendChild(arrowTd);
+      tr.insertAdjacentHTML("beforeend", `
         <td><span style="${accountPill(p.account)}">${p.account||"—"}</span></td>
         <td style="white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis">${p.name}</td>
         <td><span style="font-size:var(--text-md);color:var(--text);border:1px solid var(--border2);border-radius:20px;padding:1px 8px;white-space:nowrap">${p.category||"—"}</span></td>
         <td style="color:var(--text2);font-family:var(--font-mono)">${p.target != null && p.target !== "" ? p.target+"%" : "—"}</td>
-        <td style="font-family:var(--font-mono);white-space:nowrap">${(() => {
-          if (!p.autoInvest) return '<span style="color:var(--text3)">—</span>';
-          const secToDca = { etfPositions:'dcaETF', stockPositions:'dcaActions', cryptoPositions:'dcaCrypto' };
-          const dcaKey = secToDca[section];
-          const dcaPct = dcaKey ? (D.virements[dcaKey] || 0) : 0;
-          const budget = D.budgetInvestissement || 0;
-          const t = p.target;
-          if (!t || !dcaPct) return '<span style="color:var(--amber);font-size:var(--text-sm)">⚠ —</span>';
-          const montant = Math.round(budget * (dcaPct/100) * (t/100) * 100) / 100;
-          return '<span style="color:var(--amber)">' + eur(montant) + '</span>';
-        })()}</td>
+        <td style="font-family:var(--font-mono);white-space:nowrap">${autoInvestHtml}</td>
         <td>${(p.qty||0).toLocaleString("fr-FR",{maximumFractionDigits:4})}</td>
         <td>${eur((p.pruCurrency && p.pruCurrency !== "EUR") ? p.pru * (fxRates[p.pruCurrency]||1) : p.pru||0)}</td>
         <td data-live="price">${p._tickerError ? '<span style="background:var(--loss)20;color:var(--loss);border:1px solid #e0505044;border-radius:4px;font-size:var(--text-md);padding:1px 4px;margin-right:3px;font-family:var(--font-body)">⚠</span>' : ""}${eur(p.price||0)}</td>
         <td data-live="market" style="white-space:nowrap">${eur(p.market)}</td>
         <td data-live="pnl" class="${p.pnl>=0?'text-gain':'text-loss'}">${eur(p.pnl)}</td>
         <td data-live="perf"><span class="pnl-badge ${p.perf>=0?'up':'down'}">${pct(p.perf)}</span></td>
-        <td data-live="weight">${p.weight.toFixed(1)}%</td>`;
+        <td data-live="weight">${p.weight.toFixed(1)}%</td>`);
       // Bouton achat
       const buyTd = document.createElement("td");
       const buyBtn = document.createElement("button"); buyBtn.className = "edit-btn"; buyBtn.title = "Acheter / Vendre";
